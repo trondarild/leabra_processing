@@ -375,12 +375,12 @@ void drawSpikeStrip(Buffer[] aspikes, float threshold){
   float x_i =4; float y_i=10;  
   float margin = 1;
   fill(ptcolor);
-  noStroke(); //<>//
+  noStroke(); //<>// //<>//
   for(int j=0; j<aspikes.length; j++){
     x=0;
     text("U"+(j+1), x-25, y+5);
     for(int i=0; i<aspikes[0].array().length; i++){
-      // draw the strip //<>//
+      // draw the strip //<>// //<>//
     if(aspikes[j].array()[i] > threshold){
       rect(x, y, x_i, y_i);}
     x+= x_i + margin;
@@ -403,15 +403,15 @@ float[][] makeTopology(int dim, int type){
  // 1 nearest neighbor
  // 2 random
  /*
-  [M, N] = size(T); //<>// //<>// //<>// //<>// //<>// //<>//
+  [M, N] = size(T); //<>// //<>// //<>// //<>// //<>// //<>// //<>//
   [X, Y] = meshgrid(max(1,m-5):min(M,m+5), max(1,n-5):min(N,n+5));
   I = sub2ind(size(T), X(:), Y(:));
- */ //<>//
+ */ //<>// //<>//
  //switch (type){
-   if (type==1){ // nearest neighbor //<>// //<>//
+   if (type==1){ // nearest neighbor //<>// //<>// //<>//
      // make a source matrix filled with indeces and a border equal to 
      // kernel size
-     int[][] kernel ={{-1,-1}, {-1, 0}, {-1, 1}, //<>//
+     int[][] kernel ={{-1,-1}, {-1, 0}, {-1, 1}, //<>// //<>//
                        {0,-1}, {0, 1},
                      {1,-1}, {1,0}, {1,1}};
      int border = 1; 
@@ -434,12 +434,12 @@ float[][] makeTopology(int dim, int type){
      }
        
      
-   } //<>// //<>// //<>// //<>// //<>// //<>//
+   } //<>// //<>// //<>// //<>// //<>// //<>// //<>//
    else
    {// TODO implement random
    }
  
- return retval; //<>// //<>//
+ return retval; //<>// //<>// //<>//
 }
 
 

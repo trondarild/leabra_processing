@@ -522,6 +522,16 @@ float sumArray(float[] a){
   return r;
 }
 
+float sumArray(ArrayList<Float> a){
+  float r = 0;
+  for(int i=0; i<a.size(); i++){
+    r += a.get(i);
+  }
+  return r;
+
+}
+
+
 float[] range_expand(float low, float high, float min, float max, float[] a){
   float[] r = zeros(a.length);
   for(int i=0; i<a.length; i++){

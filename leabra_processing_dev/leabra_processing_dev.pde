@@ -1,6 +1,9 @@
 //
 //
 //
+String[] lognames = {};
+UnitSpec spec = new UnitSpec();
+Unit unit = new Unit(spec, INPUT, lognames);
 
 void setup(){
 	size(300, 300);
