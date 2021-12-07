@@ -6,6 +6,10 @@ as possible to understand. It is not in any way optimized for performance.
 */
 
 // type of layer and correspondingly, unit behaviors
+import java.util.HashMap;
+import java.util.Map;
+
+
 static int INPUT  = 0;
 static int HIDDEN = 1;
 static int OUTPUT = 2;
@@ -14,6 +18,7 @@ class Unit{
     UnitSpec spec;
     int genre = INPUT;
     
+    Map<String, Float> logs = new HashMap<String, Float>();
     String[] log_names = {"net", "I_net", "v_m", "act", "v_m_eq", "adapt"};
     float avg_ss;
     float avg_s;
@@ -32,6 +37,8 @@ class Unit{
     float act_m = 0;
     float adapt = 0;
     float spike = 0;
+    float net = 0;
+    float act_thr = 0;
     // dopa and adenosine
     float r_d1 = 0.0;
     float r_d2 = 0.0;
@@ -96,6 +103,52 @@ class Unit{
         this.adapt   = 0;     // adaptation current: causes the rate of activation
                               // to decrease over time
     }
+
+    void update_logs(){
+        // """Record current state. Called after each cycle."""
+        // TODO: find nice way of matching string to field, or revert to if block
+        // for name in self.logs.keys():
+        //    this.logs[name].append(getattr(self, name))
+    }
+
+    void show_config(){
+        //"""Display the value of constants and state variables."""
+        println("Parameters:");
+        String[] params = {"dt_v_m", "dt_net", "g_l", "g_bar_e", "g_bar_l", "g_bar_i",
+                     "e_rev_e", "e_rev_l", "e_rev_i", "act_thr", "act_gain"};
+        
+        //    print("   {}: {:.2f}".format(name, getattr(self.spec, name)))
+        println("State:");
+        String[] state = {"g_e", "I_net", "v_m", "act", "v_m_eq"};
+        for (String s : state) {
+            println(s + ": " + getField(s));
+        }
+        //    print('   {}: {:.2f}'.format(name, getattr(self, name)))
+    }
+
+    float getField(String name){
+        switch(name){
+        case "g_e": return g_e; 
+        case "I_net": return I_net; 
+        case "I_net_r": return I_net_r; 
+        case "v_m": return v_m; 
+        case "v_m_eq": return v_m_eq; 
+        case "act_ext": return act_ext; 
+        case "act": return act; 
+        case "act_nd": return act_nd; 
+        case "act_m": return act_m; 
+        case "adapt": return adapt; 
+        case "spike": return spike; 
+        case "net": return net; 
+        case "act_thr": return act_thr; 
+        case "r_d1": return r_d1;
+        case "r_d2": return r_d2;
+        case "r_a1": return r_a1;
+        case "r_a2": return r_a2;
+        default: return -1;
+        }
+    }
+
 };
 
 class UnitSpec{
@@ -326,7 +379,83 @@ class UnitSpec{
         if (this.adapt_on)
             unit.adapt += dt_integ * (
                             this.dt_adapt * (this.v_m_gain * (unit.v_m - this.e_rev_l) - unit.adapt)
-                            + unit.spike * self.spike_gain
+                            + unit.spike * this.spike_gain
+                          );
+
+        // if phase == 'minus':
+        this.update_avgs(unit, dt_integ);
+        unit.update_logs();
+    }
+
+    void cycle_da(Unit unit, String phase, float g_i, float dt_integ){
+        /*
+        """Update activity - "tick" or "step"
+        2021-12-05: TAT updated with dopa, adeno support    
+        unit    :  the unit to cycle
+        g_i     :  inhibitory input
+        dt_integ:  integration time step, in ms.
+        """ */
+        if (unit.act_ext != 0) { // forced activity
+            this.update_avgs(unit, dt_integ);
+            unit.update_logs();
+            return; // see self.force_activity
+        }
+
+        // computing I_net and I_net_r
+        unit.I_net   = this.integrate_I_net(unit, g_i, dt_integ, false, 2); // half-step integration
+        unit.I_net_r = this.integrate_I_net(unit, g_i, dt_integ, true,  1); // one-step integration
+
+        // updating v_m and v_m_eq
+        unit.v_m    += dt_integ * this.dt_v_m * unit.I_net  ; // - unit.adapt is done on the I_net value.
+        unit.v_m_eq += dt_integ * this.dt_v_m * unit.I_net_r;
+        // unit.v_m     = max(self.v_m_min, min(unit.v_m, self.v_m_max))
+
+        // modulate act_thr
+        // 2021-12-05 TAT: modulate act_thr
+        unit.act_thr = this.logistic(this.c_act_thr - unit.r_d1 + unit.r_a1 + unit.r_d2 - unit.r_a2);
+        
+
+        // reseting v_m if over the threshold (spike-like behavior)
+        if (unit.v_m > this.act_thr){ // 2021-12-05 TAT may use Dopa and Adeno to modulate act_thr!
+            unit.spike = 1;
+            unit.v_m   = this.v_m_r;
+            unit.I_net = 0.0;
+        }
+        else
+            unit.spike = 0;
+
+        // selecting the activation function, noisy or not. (note: could also use sigmoid here)
+        // act_fun = self.noisy_xx1 if self.noisy_act else self.xx1
+        float new_act = 0;
+        // computing new_act, from v_m_eq (because rate-coded neuron)
+        if (unit.v_m_eq <= this.act_thr){
+            new_act = act_fun(unit.v_m_eq - this.act_thr);
+            // print('SUBTHR {} {}\n       new_act={}'.format(unit.v_m_eq, self.act_thr, new_act))
+        }
+        else{
+            float gc_e = this.g_bar_e * unit.g_e;
+            float gc_i = this.g_bar_i * g_i;
+            float gc_l = this.g_bar_l * this.g_l;
+            float g_e_thr = (  gc_i * (this.e_rev_i - this.act_thr)
+                       + gc_l * (this.e_rev_l - this.act_thr)
+                       - unit.adapt) / (this.act_thr - this.e_rev_e);
+
+            new_act = act_fun(gc_e - g_e_thr);  // gc_e == unit.net
+            // print('ABVTHR {} net={} {}\n       new_act={}'.format(unit.v_m_eq, gc_e, g_e_thr, new_act))
+        }
+
+        // updating activity
+        unit.act_nd += dt_integ * this.dt_v_m * (new_act - unit.act_nd);
+        // print('FASTCYV act={}'.format(unit.act_nd))
+
+        // unit.act_nd = max(self.act_min, min(unit.act_nd, self.act_max))
+        unit.act = unit.act_nd; // FIXME: implement stp
+
+        // updating adaptation
+        if (this.adapt_on)
+            unit.adapt += dt_integ * (
+                            this.dt_adapt * (this.v_m_gain * (unit.v_m - this.e_rev_l) - unit.adapt)
+                            + unit.spike * this.spike_gain
                           );
 
         // if phase == 'minus':
@@ -363,10 +492,10 @@ class UnitSpec{
 
     void update_avgs(Unit unit, float dt_integ){
         // """Update all averages except long-term, at the end of every cycle."""
-        unit.avg_ss += dt_integ * this.avg_ss_dt * (unit.act_nd - unit.avg_ss)
-        unit.avg_s  += dt_integ * this.avg_s_dt  * (unit.avg_ss - unit.avg_s )
-        unit.avg_m  += dt_integ * this.avg_m_dt  * (unit.avg_s  - unit.avg_m )
-        unit.avg_s_eff = self.avg_m_in_s * unit.avg_m + (1 - self.avg_m_in_s) * unit.avg_s
+        unit.avg_ss += dt_integ * this.avg_ss_dt * (unit.act_nd - unit.avg_ss);
+        unit.avg_s  += dt_integ * this.avg_s_dt  * (unit.avg_ss - unit.avg_s );
+        unit.avg_m  += dt_integ * this.avg_m_dt  * (unit.avg_s  - unit.avg_m );
+        unit.avg_s_eff = this.avg_m_in_s * unit.avg_m + (1 - this.avg_m_in_s) * unit.avg_s;
         // print('avg_s_eff', unit.avg_s_eff)
     }
 
@@ -385,5 +514,8 @@ class UnitSpec{
         // unit.avg_l = 3
     }
 
+    float logistic(float val){
+        return 1.0/(1+exp(-val));
+    }
 
 }

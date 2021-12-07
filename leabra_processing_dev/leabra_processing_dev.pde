@@ -7,7 +7,7 @@ Unit unit = new Unit(spec, INPUT, lognames);
 
 void setup(){
 	size(300, 300);
-
+  unit.show_config();
 }
 
 void draw(){
