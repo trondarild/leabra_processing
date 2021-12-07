@@ -18,6 +18,8 @@ class Unit{
     UnitSpec spec;
     int genre = INPUT;
     Buffer buffer;
+
+    int default_buf_sz = 100;
     
     Map<String, FloatList> logs = new HashMap<String, FloatList>();
     String[] log_names = {"net", "I_net", "v_m", "act", "v_m_eq", "adapt"};
@@ -70,7 +72,7 @@ class Unit{
         this.avg_l     = this.spec.avg_l_init;
         this.avg_s_eff = 0.0 ; // linear mixing of avg_s and avg_m
 
-        buffer = new Buffer (10);
+        buffer = new Buffer (default_buf_sz);
 
     }
     
@@ -87,7 +89,7 @@ class Unit{
         this.avg_l     = this.spec.avg_l_init;
         this.avg_s_eff = 0.0 ; // linear mixing of avg_s and avg_m
 
-        buffer = new Buffer (10);
+        buffer = new Buffer (default_buf_sz);
     }
 
     float getOutput(){
@@ -118,6 +120,7 @@ class Unit{
         // return self.spec.cycle(self, phase, g_i=g_i, dt_integ=dt_integ)
         // 2021-12-05 change to use dopa, adeno
         this.spec.cycle_da(this, phase, g_i, dt_integ);
+        buffer.append(act_eq());
     }
 
     void calculate_net_in(){
