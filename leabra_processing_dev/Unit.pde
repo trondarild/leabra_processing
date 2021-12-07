@@ -31,6 +31,12 @@ class Unit{
     float act_nd = 0;
     float act_m = 0;
     float adapt = 0;
+    float spike = 0;
+    // dopa and adenosine
+    float r_d1 = 0.0;
+    float r_d2 = 0.0;
+    float r_a1 = 0.0;
+    float r_a2 = 0.0;
 
     Unit(){
         /*        
@@ -134,8 +140,9 @@ class UnitSpec{
     float v_m_min    = 0.0;     // clamp ranges (min, max) for v_m
     float v_m_max    = 2.0;     
     // adapt behavior
-    boolean adapt_on   = false  ; // if True, enable the adapt behavior
+    boolean adapt_on = false  ; // if True, enable the adapt behavior
     float dt_adapt   = 1/144. ; // time-step constant for adapt update
+    float dt_v_m     = 0.0;
     float v_m_gain   = 0.04   ; // gain on v_m driving the adaptation variable
     float spike_gain = 0.00805; // value to add to the adaptation variable after spiking
     // bias //FIXME: not implemented.
@@ -152,11 +159,7 @@ class UnitSpec{
     float avg_m_in_s = 0.1;
     float avg_lrn_min = 0.0001; // minimum avg_l_lrn value.
     float avg_lrn_max = 0.5;    // maximum avg_l_lrn value
-    // dopa and adenosine
-    float r_d1 = 0.0;
-    float r_d2 = 0.0;
-    float r_a1 = 0.0;
-    float r_a2 = 0.0;
+    
 
     float[][] nxx1_conv;
     
@@ -207,6 +210,11 @@ class UnitSpec{
         return 0;
     }
 
+    float act_fun(float v_m){
+        // TODO support noisy
+        return xx1(v_m);
+    }
+
     void calculate_net_in(Unit unit, float dt_integ){
         /** """Calculate the net input for the unit. To execute before cycle().
 
@@ -230,5 +238,152 @@ class UnitSpec{
         // updating net
         unit.g_e += dt_integ * this.dt_net() * (net_raw - unit.g_e);  // eq 2.16
     }
+
+    void force_activity(Unit unit){
+        /* """ Same as "direct in"?
+        Replace calls to `calculate_net_in` and `cycle` for forced activity units.
+
+        Note that this is computed immediately when forcing a unit's activity, and in particular
+        before cycling connections.
+        """
+        */
+        // calculate_netin
+        unit.g_e = unit.act_ext / this.g_bar_e;  // unit.net == unit.act
+        // cycle
+        unit.I_net = 0.0;
+        unit.act    = unit.act_ext;
+        unit.act_nd = unit.act_ext;
+        if (unit.act == 0)
+            unit.v_m = this.e_rev_l;
+        else
+            unit.v_m = this.act_thr + unit.act_ext / this.act_gain;
+        unit.v_m_eq = unit.v_m;
+    }
+
+    void cycle(Unit unit, String phase, float g_i, float dt_integ){
+        /*
+        """Update activity - "tick" or "step"
+
+        unit    :  the unit to cycle
+        g_i     :  inhibitory input
+        dt_integ:  integration time step, in ms.
+        """ */
+        if (unit.act_ext != 0) { // forced activity
+            this.update_avgs(unit, dt_integ);
+            unit.update_logs();
+            return; // see self.force_activity
+        }
+
+        // computing I_net and I_net_r
+        unit.I_net   = this.integrate_I_net(unit, g_i, dt_integ, false, 2); // half-step integration
+        unit.I_net_r = this.integrate_I_net(unit, g_i, dt_integ, true,  1); // one-step integration
+
+        // updating v_m and v_m_eq
+        unit.v_m    += dt_integ * this.dt_v_m * unit.I_net  ; // - unit.adapt is done on the I_net value.
+        unit.v_m_eq += dt_integ * this.dt_v_m * unit.I_net_r;
+        // unit.v_m     = max(self.v_m_min, min(unit.v_m, self.v_m_max))
+
+        // modulate act_thr
+        
+
+        // reseting v_m if over the threshold (spike-like behavior)
+        if (unit.v_m > this.act_thr){ // 2021-12-05 TAT may use Dopa and Adeno to modulate act_thr!
+            unit.spike = 1;
+            unit.v_m   = this.v_m_r;
+            unit.I_net = 0.0;
+        }
+        else
+            unit.spike = 0;
+
+        // selecting the activation function, noisy or not. (note: could also use sigmoid here)
+        // act_fun = self.noisy_xx1 if self.noisy_act else self.xx1
+        float new_act = 0;
+        // computing new_act, from v_m_eq (because rate-coded neuron)
+        if (unit.v_m_eq <= this.act_thr){
+            new_act = act_fun(unit.v_m_eq - this.act_thr);
+            // print('SUBTHR {} {}\n       new_act={}'.format(unit.v_m_eq, self.act_thr, new_act))
+        }
+        else{
+            float gc_e = this.g_bar_e * unit.g_e;
+            float gc_i = this.g_bar_i * g_i;
+            float gc_l = this.g_bar_l * this.g_l;
+            float g_e_thr = (  gc_i * (this.e_rev_i - this.act_thr)
+                       + gc_l * (this.e_rev_l - this.act_thr)
+                       - unit.adapt) / (this.act_thr - this.e_rev_e);
+
+            new_act = act_fun(gc_e - g_e_thr);  // gc_e == unit.net
+            // print('ABVTHR {} net={} {}\n       new_act={}'.format(unit.v_m_eq, gc_e, g_e_thr, new_act))
+        }
+
+        // updating activity
+        unit.act_nd += dt_integ * this.dt_v_m * (new_act - unit.act_nd);
+        // print('FASTCYV act={}'.format(unit.act_nd))
+
+        // unit.act_nd = max(self.act_min, min(unit.act_nd, self.act_max))
+        unit.act = unit.act_nd; // FIXME: implement stp
+
+        // updating adaptation
+        if (this.adapt_on)
+            unit.adapt += dt_integ * (
+                            this.dt_adapt * (this.v_m_gain * (unit.v_m - this.e_rev_l) - unit.adapt)
+                            + unit.spike * self.spike_gain
+                          );
+
+        // if phase == 'minus':
+        this.update_avgs(unit, dt_integ);
+        unit.update_logs();
+    }
+
+    float integrate_I_net(Unit unit, float g_i, float dt_integ, boolean ratecoded, int steps){
+        /* """Integrate and returns I_net for the provided v_m
+
+        :param steps:  number of intermediary integration steps.
+        """
+        */
+        assert (steps >= 1);
+        float I_net = 0;
+        float gc_e = this.g_bar_e * unit.g_e;
+        float gc_i = this.g_bar_i * g_i;
+        float gc_l = this.g_bar_l * this.g_l;
+        //float v_m_eff = unit.v_m_eq if ratecoded else unit.v_m;
+        float v_m_eff = ratecoded ? unit.v_m_eq : unit.v_m;
+
+        
+        for (int i = 0; i < steps; ++i) {
+            
+        
+            I_net = (  gc_e * (this.e_rev_e - v_m_eff)
+                     + gc_i * (this.e_rev_i - v_m_eff)
+                     + gc_l * (this.e_rev_l - v_m_eff)
+                     - unit.adapt);
+            v_m_eff += dt_integ/steps * this.dt_v_m * I_net;
+        }
+        return I_net;
+    }
+
+    void update_avgs(Unit unit, float dt_integ){
+        // """Update all averages except long-term, at the end of every cycle."""
+        unit.avg_ss += dt_integ * this.avg_ss_dt * (unit.act_nd - unit.avg_ss)
+        unit.avg_s  += dt_integ * this.avg_s_dt  * (unit.avg_ss - unit.avg_s )
+        unit.avg_m  += dt_integ * this.avg_m_dt  * (unit.avg_s  - unit.avg_m )
+        unit.avg_s_eff = self.avg_m_in_s * unit.avg_m + (1 - self.avg_m_in_s) * unit.avg_s
+        // print('avg_s_eff', unit.avg_s_eff)
+    }
+
+    void update_avg_l(Unit unit){
+        /* """Update the long-term average.
+
+        Called at the end of every trial (*not every cycle*).
+        """*/
+        unit.avg_l += this.avg_l_dt * (this.avg_l_gain * unit.avg_m - unit.avg_l);
+        unit.avg_l = max(unit.avg_l, this.avg_l_min);
+
+        // if unit.avg_m > 0.2: # FIXME: 0.2 is a magic number here
+        //     unit.avg_l += self.avg_l_dt * (self.avg_l_gain - unit.avg_l)
+        // else:
+        //     unit.avg_l += self.avg_l_dt * (self.avg_l_min - unit.avg_l)
+        // unit.avg_l = 3
+    }
+
 
 }
