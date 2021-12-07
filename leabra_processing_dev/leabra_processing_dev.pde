@@ -4,6 +4,7 @@
 String[] lognames = {};
 UnitSpec spec = new UnitSpec();
 Unit unit = new Unit(spec, INPUT, lognames);
+SignalGenerator sig = new SignalGenerator();
 
 void setup(){
 	size(300, 300);

@@ -17,8 +17,9 @@ static int OUTPUT = 2;
 class Unit{
     UnitSpec spec;
     int genre = INPUT;
+    Buffer buffer;
     
-    Map<String, Float> logs = new HashMap<String, Float>();
+    Map<String, FloatList> logs = new HashMap<String, FloatList>();
     String[] log_names = {"net", "I_net", "v_m", "act", "v_m_eq", "adapt"};
     float avg_ss;
     float avg_s;
@@ -69,6 +70,8 @@ class Unit{
         this.avg_l     = this.spec.avg_l_init;
         this.avg_s_eff = 0.0 ; // linear mixing of avg_s and avg_m
 
+        buffer = new Buffer (10);
+
     }
     
     Unit(UnitSpec spec, int genre, String[] log_names){
@@ -84,8 +87,75 @@ class Unit{
         this.avg_l     = this.spec.avg_l_init;
         this.avg_s_eff = 0.0 ; // linear mixing of avg_s and avg_m
 
+        buffer = new Buffer (10);
     }
-    
+
+    float getOutput(){
+        return act_eq();
+    }
+
+    Buffer getBuffer(){
+        return buffer;
+    }
+
+    float act_eq(){
+        return act;
+    }
+
+    float avg_l_lrn(){
+        return this.spec.avg_l_lrn(this);
+    }
+
+    void cycle(String phase){
+        this.cycle(phase, 0.0, 1);
+    }
+
+    void cycle(String phase, float g_i, float dt_integ){
+        // """Cycle the unit"""
+        // phase = "minus", "plus"
+        // g_i - inhibition input 0..1
+        // dt_integ - time delta (?)
+        // return self.spec.cycle(self, phase, g_i=g_i, dt_integ=dt_integ)
+        // 2021-12-05 change to use dopa, adeno
+        this.spec.cycle_da(this, phase, g_i, dt_integ);
+    }
+
+    void calculate_net_in(){
+        this.spec.calculate_net_in(this, 1);
+    }
+
+    float net(){
+        // """Excitatory conductance."""
+        return this.spec.g_bar_e * this.g_e;
+    }
+
+    void force_activity(float act_ext){
+        /** """Force the activity of a unit.
+
+        The activity of the unit will remain at that value for subsequent cycles,
+        until `force_activity()` is called with a different values, or until
+        `add_excitatory()` is called, which will resume updating `I_net` and
+        `v_m` and compute `act` based on those.
+        """
+        */
+        assert (this.ex_inputs.size() == 0);  // avoiding mistakes
+        this.act_ext = act_ext; //# forced activity
+        this.spec.force_activity(this);
+
+        // # self.act    = act  # FIXME: should the activity be delayed until the start of the next cycle?
+        // # self.act_nd = act
+    }
+
+    void add_excitatory(float inp_act){
+        // """Add an input for the next cycle."""
+        this.ex_inputs.add(inp_act);
+    }
+
+    void update_avg_l(){
+        this.spec.update_avg_l(this);
+    }
+
+
     void reset(){
         // """Reset the Unit state. Called at creation, and at every trial."""
         this.ex_inputs.clear();              // excitatory inputs for the next cycle
@@ -125,6 +195,8 @@ class Unit{
         }
         //    print('   {}: {:.2f}'.format(name, getattr(self, name)))
     }
+
+    
 
     float getField(String name){
         switch(name){
