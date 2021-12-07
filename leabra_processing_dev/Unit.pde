@@ -119,6 +119,7 @@ class Unit{
         // dt_integ - time delta (?)
         // return self.spec.cycle(self, phase, g_i=g_i, dt_integ=dt_integ)
         // 2021-12-05 change to use dopa, adeno
+        println("unit cycle: " + ex_inputs.toString());
         this.spec.cycle_da(this, phase, g_i, dt_integ);
         buffer.append(act_eq());
     }
@@ -152,6 +153,7 @@ class Unit{
     void add_excitatory(float inp_act){
         // """Add an input for the next cycle."""
         this.ex_inputs.add(inp_act);
+
     }
 
     void update_avg_l(){
@@ -321,6 +323,7 @@ class UnitSpec{
     float xx1(float v_m){
         // """Compute the x/(x+1) activation function."""
         float X = this.act_gain * max(v_m, 0.0);
+        println("xx1: X= " + X + "v_m= "+v_m);
         return X / (X + 1);
     }
 
@@ -358,13 +361,13 @@ class UnitSpec{
         float net_raw = 0.0;
         if (unit.ex_inputs.size() > 0){
             // computing net_raw, the total, instantaneous, excitatory input for the neuron
-            
             net_raw = sumArray(unit.ex_inputs);
             unit.ex_inputs.clear();
         }
 
         // updating net
         unit.g_e += dt_integ * this.dt_net() * (net_raw - unit.g_e);  // eq 2.16
+        println("spec.calcnetin: unit.g_e: " + unit.g_e);
     }
 
     void force_activity(Unit unit){
@@ -491,7 +494,7 @@ class UnitSpec{
         
 
         // reseting v_m if over the threshold (spike-like behavior)
-        if (unit.v_m > this.act_thr){ // 2021-12-05 TAT may use Dopa and Adeno to modulate act_thr!
+        if (unit.v_m > unit.act_thr){ // 2021-12-05 TAT may use Dopa and Adeno to modulate act_thr!
             unit.spike = 1;
             unit.v_m   = this.v_m_r;
             unit.I_net = 0.0;
@@ -503,9 +506,10 @@ class UnitSpec{
         // act_fun = self.noisy_xx1 if self.noisy_act else self.xx1
         float new_act = 0;
         // computing new_act, from v_m_eq (because rate-coded neuron)
-        if (unit.v_m_eq <= this.act_thr){
-            new_act = act_fun(unit.v_m_eq - this.act_thr);
+        if (unit.v_m_eq <= unit.act_thr){
+            new_act = act_fun(unit.v_m_eq - unit.act_thr);
             // print('SUBTHR {} {}\n       new_act={}'.format(unit.v_m_eq, self.act_thr, new_act))
+            println("cycle_da: < thr" + new_act);
         }
         else{
             float gc_e = this.g_bar_e * unit.g_e;
@@ -517,8 +521,9 @@ class UnitSpec{
 
             new_act = act_fun(gc_e - g_e_thr);  // gc_e == unit.net
             // print('ABVTHR {} net={} {}\n       new_act={}'.format(unit.v_m_eq, gc_e, g_e_thr, new_act))
+            println("cycle_da: > thr" + new_act);
         }
-
+        
         // updating activity
         unit.act_nd += dt_integ * this.dt_v_m * (new_act - unit.act_nd);
         // print('FASTCYV act={}'.format(unit.act_nd))
@@ -562,6 +567,7 @@ class UnitSpec{
                      - unit.adapt);
             v_m_eff += dt_integ/steps * this.dt_v_m * I_net;
         }
+        println("integrate_I_net: I_net= " + I_net);
         return I_net;
     }
 

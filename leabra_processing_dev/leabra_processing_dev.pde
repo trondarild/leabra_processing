@@ -13,10 +13,11 @@ void setup(){
 
 void update(){
 	unit.add_excitatory(sig.getOutput());
-
+	unit.calculate_net_in();
+	//println(sig.getOutput());
 	sig.tick();
 	unit.cycle("minus");
-	unit.show_config();
+	//unit.show_config();
 }
 void draw(){
 	update();
