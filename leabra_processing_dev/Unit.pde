@@ -119,8 +119,9 @@ class Unit{
         // dt_integ - time delta (?)
         // return self.spec.cycle(self, phase, g_i=g_i, dt_integ=dt_integ)
         // 2021-12-05 change to use dopa, adeno
-        println("unit cycle: " + ex_inputs.toString());
-        this.spec.cycle_da(this, phase, g_i, dt_integ);
+        
+        // this.spec.cycle_da(this, phase, g_i, dt_integ);
+        this.spec.cycle(this, phase, g_i, dt_integ);
         buffer.append(act_eq());
     }
 
@@ -272,7 +273,7 @@ class UnitSpec{
     // adapt behavior
     boolean adapt_on = false  ; // if True, enable the adapt behavior
     float dt_adapt   = 1/144. ; // time-step constant for adapt update
-    float dt_v_m     = 0.0;
+    // float dt_v_m     = 0.0;
     float v_m_gain   = 0.04   ; // gain on v_m driving the adaptation variable
     float spike_gain = 0.00805; // value to add to the adaptation variable after spiking
     // bias //FIXME: not implemented.
@@ -410,10 +411,10 @@ class UnitSpec{
         unit.I_net_r = this.integrate_I_net(unit, g_i, dt_integ, true,  1); // one-step integration
 
         // updating v_m and v_m_eq
-        unit.v_m    += dt_integ * this.dt_v_m * unit.I_net  ; // - unit.adapt is done on the I_net value.
-        unit.v_m_eq += dt_integ * this.dt_v_m * unit.I_net_r;
+        unit.v_m    += dt_integ * this.dt_v_m() * unit.I_net  ; // - unit.adapt is done on the I_net value.
+        unit.v_m_eq += dt_integ * this.dt_v_m() * unit.I_net_r;
         // unit.v_m     = max(self.v_m_min, min(unit.v_m, self.v_m_max))
-
+        println("cycle unit.v_m_eq= " + unit.v_m_eq);
         // modulate act_thr
         
 
@@ -447,7 +448,7 @@ class UnitSpec{
         }
 
         // updating activity
-        unit.act_nd += dt_integ * this.dt_v_m * (new_act - unit.act_nd);
+        unit.act_nd += dt_integ * this.dt_v_m() * (new_act - unit.act_nd);
         // print('FASTCYV act={}'.format(unit.act_nd))
 
         // unit.act_nd = max(self.act_min, min(unit.act_nd, self.act_max))
@@ -484,8 +485,8 @@ class UnitSpec{
         unit.I_net_r = this.integrate_I_net(unit, g_i, dt_integ, true,  1); // one-step integration
 
         // updating v_m and v_m_eq
-        unit.v_m    += dt_integ * this.dt_v_m * unit.I_net  ; // - unit.adapt is done on the I_net value.
-        unit.v_m_eq += dt_integ * this.dt_v_m * unit.I_net_r;
+        unit.v_m    += dt_integ * this.dt_v_m() * unit.I_net  ; // - unit.adapt is done on the I_net value.
+        unit.v_m_eq += dt_integ * this.dt_v_m() * unit.I_net_r;
         // unit.v_m     = max(self.v_m_min, min(unit.v_m, self.v_m_max))
 
         // modulate act_thr
@@ -525,7 +526,7 @@ class UnitSpec{
         }
         
         // updating activity
-        unit.act_nd += dt_integ * this.dt_v_m * (new_act - unit.act_nd);
+        unit.act_nd += dt_integ * this.dt_v_m() * (new_act - unit.act_nd);
         // print('FASTCYV act={}'.format(unit.act_nd))
 
         // unit.act_nd = max(self.act_min, min(unit.act_nd, self.act_max))
@@ -565,7 +566,7 @@ class UnitSpec{
                      + gc_i * (this.e_rev_i - v_m_eff)
                      + gc_l * (this.e_rev_l - v_m_eff)
                      - unit.adapt);
-            v_m_eff += dt_integ/steps * this.dt_v_m * I_net;
+            v_m_eff += dt_integ/steps * this.dt_v_m() * I_net;
         }
         println("integrate_I_net: I_net= " + I_net);
         return I_net;
