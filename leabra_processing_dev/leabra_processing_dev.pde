@@ -13,6 +13,11 @@ ConnectionSpec ffexcite_spec  = new ConnectionSpec();
 
 Connection IH_conn = new Connection(input_layer,  hidden_layer, ffexcite_spec);
 
+NetworkSpec network_spec = new NetworkSpec(50);
+Layer[] layers =  {input_layer, hidden_layer};
+Connection[] conns = {IH_conn};
+Network netw = new Network(network_spec, layers, conns);
+
 void setup(){
 	size(400, 400);
 	// unit.show_config();
@@ -34,7 +39,7 @@ void update(){
 	input_layer.cycle("minus");
 	sig.tick();
 	unit.cycle("minus");
-	IH_conn.cycle();
+	//IH_conn.cycle();
 	//unit.show_config();
 }
 

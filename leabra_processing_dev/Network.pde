@@ -27,8 +27,8 @@ class Network{
     int trial_count;
     String phase;
 
-    ArrayList<Layer> layers;
-    ArrayList<Connection> connections;
+    ArrayList<Layer> layers = new ArrayList<Layer>();
+    ArrayList<Connection> connections = new ArrayList<Connection>();
     Map<String, FloatList> inputs = new HashMap<String, FloatList>();
     Map<String, FloatList> outputs = new HashMap<String, FloatList>();
 
@@ -42,14 +42,17 @@ class Network{
         this.quarter_nb  = 1; // current quarter number (1, 2, 3 or 4)
         this.trial_count = 0; // number of trial finished
         this.phase       = "minus";
-
+        
         // this.layers      = new ArrayList<Layers>(Arrays.asList(layers));
+        assert(layers != null);
         for (Layer l : layers) {this.layers.add(l);}
         
         // this.connections = new ArrayList<Connection>(Arrays.asList(connections));
+        assert(connections != null);
         for (Connection c : connections) {this.connections.add(c);}
         // this._inputs; 
         // this._outputs = {}, {}
+        
         this.build();
     }
 
