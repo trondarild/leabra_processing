@@ -28,6 +28,7 @@ class Connection{
     ArrayList<Link> links = new ArrayList<Link>();
     float wt_scale_act;
     float wt_scale_rel_eff;
+    ConnectionSpec spec;
 
     Connection( Layer pre_layer, Layer post_layer, ConnectionSpec spec){
         /* """
@@ -41,7 +42,7 @@ class Connection{
         // this.links = 
         this.spec  = spec;
         if (this.spec == null)
-            this.spec = ConnectionSpec();
+            this.spec = new ConnectionSpec();
 
         this.wt_scale_act = 1.0;  // scaling relative to activity.
         this.wt_scale_rel_eff = 0;  // effective relative scaling weight, once other connections
@@ -65,11 +66,11 @@ class Connection{
         // """Return a matrix of the links weights"""
         // TODO add support for general topologies
         float[][] W;
-        if (this.spec.proj.lower() == "1to1"){
+        if (this.spec.proj.toLowerCase() == "1to1"){
             //return np.array([[link.wt for link in this.links]])
             W = zeros(1, links.size());
             for (int i = 0; i < links.size(); ++i) {
-                W[0][i] = links[i].wt;
+                W[0][i] = links.get(i).wt;
             }
             return W;
         }
@@ -81,7 +82,7 @@ class Connection{
             //         W[i, j] = next(link_it).wt
             int l = 0;
             for (int j = 0; j < pre.units.length; ++j) {
-                for (int i = 0; i < post.length; ++i) {
+                for (int i = 0; i < post.units.length; ++i) {
                     W[j][i] = links.get(l++).wt;;
                 }
                 
@@ -92,18 +93,18 @@ class Connection{
 
     void weights(float[][] value){
         // """Override the links weights"""
-        if (this.spec.proj.lower() == '1to1'){
-            assert (value[0].length == this.links.length);
+        if (this.spec.proj.toLowerCase() == "1to1"){
+            assert (value[0].length == this.links.size());
             //for wt, link in zip(value, this.links):
             for (int i = 0; i < value.length; ++i) {
-                links[i].wt  = value[i];
-                links[i].fwt = this.spec.sig_inv(value[i]);
+                links.get(i).wt  = value[0][i];
+                links.get(i).fwt = this.spec.sig_inv(value[0][i]);
             }
                 
         }
         else{  // proj == 'full'
             // link_it = iter(this.links)  // link iterator
-            assert (value.length * value[0].length == this.links.length);
+            assert (value.length * value[0].length == this.links.size());
             // for i, pre_u in enumerate(this.pre.units):
             //     for j, post_u in enumerate(this.post.units):
             //         link = next(link_it)
@@ -111,9 +112,9 @@ class Connection{
             //         link.fwt = this.spec.sig_inv(value[i][j])
             int l = 0;
             for (int j = 0; j < pre.units.length; ++j) {
-                for (int i = 0; i < post.length; ++i) {
-                    links[i].wt  = value[j][i];
-                    links[i].fwt = this.spec.sig_inv(value[j][i]);
+                for (int i = 0; i < post.units.length; ++i) {
+                    links.get(i).wt  = value[j][i];
+                    links.get(i).fwt = this.spec.sig_inv(value[j][i]);
                 }
             }
         }
@@ -123,7 +124,7 @@ class Connection{
         this.spec.learn(this);
     }
 
-    void cycle(self){
+    void cycle(){
         this.spec.cycle(this);
     }
 
@@ -166,10 +167,10 @@ class ConnectionSpec{
     }
 
     void cycle(Connection connection){
-        """Transmit activity."""
+        // """Transmit activity."""
         for (Link link : connection.links){
             if (link.post.act_ext ==0){ // activity not forced
-                float scaled_act = this.wt_scale_abs * connection.wt_scale * link.wt * link.pre.act;
+                float scaled_act = this.wt_scale_abs * connection.wt_scale() * link.wt * link.pre.act;
                 link.post.add_excitatory(scaled_act);
             }
         }
@@ -184,6 +185,7 @@ class ConnectionSpec{
             float val = randomGaussian();
             return val * sqrt(this.rnd_var) + this.rnd_mean;
         }
+        return 0;
     }
 
     void full_projection(Connection connection){
@@ -191,8 +193,8 @@ class ConnectionSpec{
         connection.links.clear();
         //for i, pre_u in enumerate(connection.pre.units):
         //    for j, post_u in enumerate(connection.post.units):
-        for (int j = 0; j < pre.units.length; ++j) {
-            for (int i = 0; i < post.length; ++i) {
+        for (int j = 0; j < connection.pre.units.length; ++j) {
+            for (int i = 0; i < connection.post.units.length; ++i) {
                 Unit pre_u = connection.pre.units[j];
                 Unit post_u = connection.post.units[i];
                 float w0 = this.rnd_wt();
@@ -208,13 +210,13 @@ class ConnectionSpec{
         connection.links.clear();
         assert (connection.pre.units.length == connection.post.units.length);
         // for i, (pre_u, post_u) in enumerate(zip(connection.pre.units, connection.post.units)):
-        for (int i = 0; i < len; ++i) {
+        for (int i = 0; i < connection.pre.units.length; ++i) {
             Unit pre_u = connection.pre.units[i];
             Unit post_u = connection.post.units[i];
-            w0 = this._rnd_wt();
-            fw0 = this.sig_inv(w0);
+            float w0 = this.rnd_wt();
+            float fw0 = this.sig_inv(w0);
             int[] ix = {i, i};
-            connection.links.add(Link(pre_u, post_u, w0, fw0, ix));
+            connection.links.add(new Link(pre_u, post_u, w0, fw0, ix));
         }
             
     }
@@ -278,7 +280,7 @@ class ConnectionSpec{
             // print('{}:{} erro {}\n  ru_avg_s_eff={}\n  su_avg_s_eff={}\n  srs={}\n  ru_avg_m={}\n  su_avg_m={}\n  srm={}'.format(connection.post.name, i, this.m_lrn  * this.xcal(srs, srm), link.post.avg_s_eff, link.pre.avg_s_eff, srs, link.post.avg_m, link.pre.avg_m, srm))
             // print('{}:{} hebb {}\n  avg_l_lrn={}\n  xcal={}\n  srs={}\n  avg_l={}'.format(connection.post.name, i, link.post.avg_l_lrn * this.xcal(srs, link.post.avg_l), link.post.avg_l_lrn, this.xcal(srs, link.post.avg_l), srs, link.post.avg_l))
             link.dwt += (  this.lrate * ( this.m_lrn * this.xcal(srs, srm)
-                         + link.post.avg_l_lrn * this.xcal(srs, link.post.avg_l)))
+                         + link.post.avg_l_lrn() * this.xcal(srs, link.post.avg_l)));
             i++;
         }
     }
@@ -286,14 +288,21 @@ class ConnectionSpec{
     float xcal(float x, float th){
         if (x < this.d_thr)
             return 0;
-        else if (x > th * this.d_rev):
+        else if (x > th * this.d_rev)
             return (x - th);
         else
             return (-x * ((1 - this.d_rev)/this.d_rev));
     }
 
     float sig(float w){
-        return 1 / (1 + (this.sig_off * pow((1 - w) / w), this.sig_gain));
+        return 1 / 
+            (1 + 
+                (this.sig_off * pow(
+                    (
+                        (1 - w) / w
+                    ), this.sig_gain)
+                )
+            );
     }
 
     float sig_inv(float w){
