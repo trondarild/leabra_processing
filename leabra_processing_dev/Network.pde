@@ -2,9 +2,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 class NetworkSpec{
-    """Network parameters"""
+    // """Network parameters"""
     int quarter_size = 25;
-    NetworkSpec(int quarter_size){:
+    NetworkSpec(){}
+    
+    NetworkSpec(int quarter_size){
         // number of cycles in a settle period
         this.quarter_size = quarter_size;
 
@@ -16,7 +18,7 @@ class NetworkSpec{
 }
 
 class Network{
-    """Leabra Network class"""
+    // """Leabra Network class"""
     NetworkSpec spec;
 
     int cycle_count;
@@ -30,10 +32,10 @@ class Network{
     Map<String, FloatList> inputs = new HashMap<String, FloatList>();
     Map<String, FloatList> outputs = new HashMap<String, FloatList>();
 
-    Network (Network spec, Layer[] layers, Connection[] connections){
-        this.spec = spec
+    Network (NetworkSpec spec, Layer[] layers, Connection[] connections){
+        this.spec = spec;
         if (this.spec == null)
-            this.spec = NetworkSpec();
+            this.spec = new NetworkSpec();
 
         this.cycle_count = 0; // number of cycles finished in the current trial
         this.cycle_tot   = 0; // total number of cycles executed (not reset at end of trial)
@@ -41,12 +43,14 @@ class Network{
         this.trial_count = 0; // number of trial finished
         this.phase       = "minus";
 
-        this.layers      = new ArrayList<Layers>(layers);
-        this.connections = new ArrayList<Connection>(connections);
-
+        // this.layers      = new ArrayList<Layers>(Arrays.asList(layers));
+        for (Layer l : layers) {this.layers.add(l);}
+        
+        // this.connections = new ArrayList<Connection>(Arrays.asList(connections));
+        for (Connection c : connections) {this.connections.add(c);}
         // this._inputs; 
         // this._outputs = {}, {}
-        this.build()
+        this.build();
     }
 
     void add_connection(Connection connection){
@@ -55,7 +59,7 @@ class Network{
     }
 
     void add_layer(Layer layer){
-        this.layers.append(layer);
+        this.layers.add(layer);
     }
 
     void build(){
@@ -83,7 +87,7 @@ class Network{
         """ */
         for (Layer layer : this.layers)
             if (layer.name == name)
-                return layer
+                return layer;
         println("layer " + name + " not found.");
         return null;
     }
@@ -127,19 +131,24 @@ class Network{
 
             if (this.quarter_nb == 1){ // start of trial
                 // reset all layers
-                if this.quarter_nb == 1:
-                    for layer in this.layers:
-                        layer.trial_init()
+                if (this.quarter_nb == 1)
+                    for (Layer layer : this.layers)
+                        layer.trial_init();
                 // force activities for inputs
                 // for name, activities in this._inputs.items():
-                inputs.forEach((name, activities) ->  this.get_layer(name).force_activity(activities));
+                // inputs.forEach((k, v) ->  this.get_layer(k).force_activity(Floats.toArray(v)));
+                for (Map.Entry<String, FloatList> entry : inputs.entrySet()) {
+                    this.get_layer(entry.getKey()).force_activity(entry.getValue());
+                }
                    
             }
             else if (this.quarter_nb == 4) // start of plus phase
                 // force activities for outputs
                 // for name, activities in this._outputs.items():
                 //     this._get_layer(name).force_activity(activities)
-                outputs.forEach((name, activities) ->  this.get_layer(name).force_activity(activities));
+                for (Map.Entry<String, FloatList> entry : outputs.entrySet()) {
+                    this.get_layer(entry.getKey()).force_activity(entry.getValue());
+                }
         }
     }
 

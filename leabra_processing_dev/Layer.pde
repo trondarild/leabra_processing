@@ -59,7 +59,7 @@ class Layer{
     float[] getOutput(){
       return activities();
     }
-    
+
     float[] activities(){
         // """Return the matrix of the units's activities"""
         float[] retval = zeros(units.length);
@@ -96,6 +96,14 @@ class Layer{
         //for u, act in zip(self.units, activities):
         for (int i = 0; i < units.length; ++i) {
             units[i].force_activity(activities[i]);
+        }
+    }
+    void force_activity(FloatList activities){
+        // """Set the units's activities equal to the inputs."""
+        assert (activities.size() == units.length);
+        //for u, act in zip(self.units, activities):
+        for (int i = 0; i < units.length; ++i) {
+            units[i].force_activity(activities.get(i));
         }
     }
 
