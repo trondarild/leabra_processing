@@ -15,11 +15,11 @@ Connection IH_conn = new Connection(input_layer,  hidden_layer, ffexcite_spec);
 
 void setup(){
 	size(400, 400);
-  // unit.show_config();
-  ffexcite_spec.proj="full";
-ffexcite_spec.rnd_type="uniform" ;
-ffexcite_spec.rnd_mean=0.25;
-ffexcite_spec.rnd_var=0.2;
+	// unit.show_config();
+	ffexcite_spec.proj="full";
+	ffexcite_spec.rnd_type="uniform" ;
+	ffexcite_spec.rnd_mean=0.25;
+	ffexcite_spec.rnd_var=0.2;
 
 }
 
@@ -37,6 +37,7 @@ void update(){
 	IH_conn.cycle();
 	//unit.show_config();
 }
+
 void draw(){
 	update();
 	background(51);
