@@ -75,6 +75,21 @@ class Unit{
         buffer = new Buffer (default_buf_sz);
 
     }
+    Unit(UnitSpec spec, int genre){
+        this.spec = spec;
+        this.genre = genre;
+        this.log_names = new String[1];
+        this.reset();
+
+        // averages of the activity
+        this.avg_ss    = this.spec.avg_init; // super-short-term average
+        this.avg_s     = this.spec.avg_init; // short-term average
+        this.avg_m     = this.spec.avg_init; // medium-term average
+        this.avg_l     = this.spec.avg_l_init;
+        this.avg_s_eff = 0.0 ; // linear mixing of avg_s and avg_m
+
+        buffer = new Buffer (default_buf_sz);
+    }
     
     Unit(UnitSpec spec, int genre, String[] log_names){
         this.spec = spec;

@@ -732,3 +732,7 @@ float hysteresis(float in, float prev, float lo_thr, float hi_thr){
   else r = prev;
   return r;
 }
+
+int len(float[] a){
+  return a.length;
+}

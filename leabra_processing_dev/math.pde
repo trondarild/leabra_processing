@@ -531,6 +531,10 @@ float sumArray(ArrayList<Float> a){
 
 }
 
+float mean(float[] a){
+  return sumArray(a)/a.length;
+}
+
 
 float[] range_expand(float low, float high, float min, float max, float[] a){
   float[] r = zeros(a.length);
