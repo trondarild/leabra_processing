@@ -11,10 +11,10 @@ class Link{
     int[] index;
     int key;
     Link(Unit pre_unit, Unit post_unit, float w0, float fw0, int[] index){
-        this.pre = pre;
-        this.post = post;
-        this.wt = wt;
-        this.fwt = fwt;
+        this.pre = pre_unit;
+        this.post = post_unit;
+        this.wt = w0;
+        this.fwt = fw0;
         this.dwt = 0.f;
         this.key = 0;
         this.index = index;
@@ -39,7 +39,7 @@ class Connection{
         */ 
         this.pre   = pre_layer;
         this.post  = post_layer;
-        // this.links = 
+        
         this.spec  = spec;
         if (this.spec == null)
             this.spec = new ConnectionSpec();
@@ -52,6 +52,8 @@ class Connection{
 
         pre_layer.from_connections.add(this);
         post_layer.to_connections.add(this);
+
+        
     }
 
     float wt_scale(){
