@@ -105,8 +105,10 @@ class Network{
     }
 
     void set_outputs(Map<String, FloatList> act_map){
-        /* """Set inputs activities, set at the beginning of all quarters.
-
+        /* 
+        """Set inputs activities, set at the beginning of all quarters.
+        # Note: "outputs" appears only to be used to compute error signal (sse),
+            ie difference between a (learning) signal and actual layer output
         :param act_map:  a dict with layer names as keys, and activities arrays
                          as values
         """ */
@@ -168,6 +170,8 @@ class Network{
 
     void cycle(){
         // """Execute a cycle"""
+        // takes care of minus (prediction) and
+        // plus (sensing) phases
         this.pre_cycle();
 
         for (Connection conn : this.connections)
@@ -182,6 +186,7 @@ class Network{
 
     void quarter(){ // FIXME:
         // """Execute a quarter"""
+        // simply cycles <quarter> number of times
         this.cycle();
         while (this.cycle_count < this.spec.quarter_size)
             this.cycle();

@@ -167,6 +167,10 @@ class LayerSpec{
 
     }
 
+    LayerSpec(boolean inhib){
+        lay_inhib = inhib;
+    }
+
     float inhibition(Layer layer){
         // """Compute the layer inhibition"""
         if (this.lay_inhib) {

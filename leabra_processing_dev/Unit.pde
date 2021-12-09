@@ -204,15 +204,15 @@ class Unit{
 
     void show_config(){
         //"""Display the value of constants and state variables."""
-        println("Parameters:");
+        // println("Parameters:");
         String[] params = {"dt_v_m", "dt_net", "g_l", "g_bar_e", "g_bar_l", "g_bar_i",
                      "e_rev_e", "e_rev_l", "e_rev_i", "act_thr", "act_gain"};
         
         //    print("   {}: {:.2f}".format(name, getattr(self.spec, name)))
-        println("State:");
+        // println("State:");
         String[] state = {"g_e", "I_net", "v_m", "act", "v_m_eq"};
         for (String s : state) {
-            println(s + ": " + getField(s));
+            // println(s + ": " + getField(s));
         }
         //    print('   {}: {:.2f}'.format(name, getattr(self, name)))
     }
@@ -339,7 +339,7 @@ class UnitSpec{
     float xx1(float v_m){
         // """Compute the x/(x+1) activation function."""
         float X = this.act_gain * max(v_m, 0.0);
-        println("xx1: X= " + X + "v_m= "+v_m);
+        // println("xx1: X= " + X + "v_m= "+v_m);
         return X / (X + 1);
     }
 
@@ -383,7 +383,7 @@ class UnitSpec{
 
         // updating net
         unit.g_e += dt_integ * this.dt_net() * (net_raw - unit.g_e);  // eq 2.16
-        println("spec.calcnetin: unit.g_e: " + unit.g_e);
+        // println("spec.calcnetin: unit.g_e: " + unit.g_e);
     }
 
     void force_activity(Unit unit){
@@ -429,7 +429,7 @@ class UnitSpec{
         unit.v_m    += dt_integ * this.dt_v_m() * unit.I_net  ; // - unit.adapt is done on the I_net value.
         unit.v_m_eq += dt_integ * this.dt_v_m() * unit.I_net_r;
         // unit.v_m     = max(self.v_m_min, min(unit.v_m, self.v_m_max))
-        println("cycle unit.v_m_eq= " + unit.v_m_eq);
+        // println("cycle unit.v_m_eq= " + unit.v_m_eq);
         // modulate act_thr
         
 
@@ -525,7 +525,7 @@ class UnitSpec{
         if (unit.v_m_eq <= unit.act_thr){
             new_act = act_fun(unit.v_m_eq - unit.act_thr);
             // print('SUBTHR {} {}\n       new_act={}'.format(unit.v_m_eq, self.act_thr, new_act))
-            println("cycle_da: < thr" + new_act);
+            // println("cycle_da: < thr" + new_act);
         }
         else{
             float gc_e = this.g_bar_e * unit.g_e;
@@ -537,7 +537,7 @@ class UnitSpec{
 
             new_act = act_fun(gc_e - g_e_thr);  // gc_e == unit.net
             // print('ABVTHR {} net={} {}\n       new_act={}'.format(unit.v_m_eq, gc_e, g_e_thr, new_act))
-            println("cycle_da: > thr" + new_act);
+            // println("cycle_da: > thr" + new_act);
         }
         
         // updating activity
@@ -583,7 +583,7 @@ class UnitSpec{
                      - unit.adapt);
             v_m_eff += dt_integ/steps * this.dt_v_m() * I_net;
         }
-        println("integrate_I_net: I_net= " + I_net);
+        // println("integrate_I_net: I_net= " + I_net);
         return I_net;
     }
 
