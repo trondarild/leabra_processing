@@ -100,7 +100,7 @@ void draw(){
 
 	pushMatrix();
 	translate(100,100);
-	drawTimeSeries(input_layer.getBuffers()[0].array(), 2, 1, 0);
+	drawTimeSeries(input_layer.getBuffers()[2].array(), 2, 1, 0);
 	popMatrix();
 
 	pushMatrix();
@@ -110,12 +110,12 @@ void draw(){
 
 	pushMatrix();
 	translate(100,300);
-	drawTimeSeries(input_layer.getBuffers()[2].array(), 2, 1, 0);
+	drawTimeSeries(input_layer.getBuffers()[0].array(), 2, 1, 0);
 	popMatrix();
 
 	pushMatrix();
 	translate(200,100);
-	drawTimeSeries(hidden_layer.getBuffers()[0].array(), 2, 1, 0);
+	drawTimeSeries(hidden_layer.getBuffers()[2].array(), 2, 1, 0);
 	popMatrix();
 
 	pushMatrix();
@@ -125,7 +125,7 @@ void draw(){
 
 	pushMatrix();
 	translate(200,300);
-	drawTimeSeries(hidden_layer.getBuffers()[2].array(), 2, 1, 0);
+	drawTimeSeries(hidden_layer.getBuffers()[0].array(), 2, 1, 0);
 	popMatrix();
 
 	pushMatrix();
