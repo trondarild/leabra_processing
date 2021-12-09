@@ -14,5 +14,5 @@ This model is meant to be an implementation of the PBWM model due to O'Reilly an
    2. VTA - dopa 
    2. GPi/SNr - output to thalamus
 3. Thalamus
-3. Amygdala - learning
-3. Hypothalamus - learning
+3. Amygdala - conditional learning, reward cue signal
+3. Hypothalamus - unconditional learning, reward signal (energy gain, saving)
