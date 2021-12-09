@@ -11,15 +11,20 @@ SignalGenerator sig = new SignalGenerator(eTickSquare, 50, 40, 100);
 
 // units
 UnitSpec unit_spec = new UnitSpec();
+UnitSpec unit_spec_bias = new UnitSpec();
 // Unit unit = new Unit(spec, INPUT, lognames);
 
 // layers
-Layer sense_layer = new Layer(1, new LayerSpec(), unit_spec, INPUT, "Input");
-Layer input_layer = new Layer(3, new LayerSpec(), unit_spec, HIDDEN, "Hidden");
-Layer hidden_layer = new Layer(3, new LayerSpec(), unit_spec, HIDDEN, "Output");
+Layer sense_layer = new Layer(4, new LayerSpec(false), unit_spec, INPUT, "Input");
+Layer inhib_layer = new Layer(2, new LayerSpec(false), unit_spec, HIDDEN, "Hidden");
+Layer hidden_layer = new Layer(4, new LayerSpec(false), unit_spec_bias, HIDDEN, "Output");
 
 // connections
 ConnectionSpec ffexcite_spec  = new ConnectionSpec();
+ConnectionSpec ffinhib_spec  = new ConnectionSpec(); 
+ConnectionSpec fbinhib_spec  = new ConnectionSpec(); 
+ConnectionSpec inhib_spec  = new ConnectionSpec(); 
+ConnectionSpec inhibinhib_spec  = new ConnectionSpec(); 
 Connection SI_conn = new Connection(sense_layer, input_layer, ffexcite_spec);
 Connection IH_conn = new Connection(input_layer,  hidden_layer, ffexcite_spec);
 Connection HI_conn = new Connection(hidden_layer,  input_layer, ffexcite_spec);
@@ -38,11 +43,34 @@ int cyc = 0;
 
 void setup(){
 	size(400, 600);
+	unit_spec_bias.bias = 0.1;
 	// unit.show_config();
 	ffexcite_spec.proj="full";
-	ffexcite_spec.rnd_type="gaussian" ;
+	ffexcite_spec.rnd_type="uniform" ;
 	ffexcite_spec.rnd_mean=0.25;
-	ffexcite_spec.rnd_var=0.52;
+	ffexcite_spec.rnd_var=0.2;
+
+	ffinhib_spec.proj="full";
+	ffinhib_spec.rnd_type="gaussian" ;
+	ffinhib_spec.rnd_mean=0.25;
+	ffinhib_spec.rnd_var=0.2;
+
+	fbinhib_spec.proj="full";
+	fbinhib_spec.rnd_type="uniform" ;	
+	fbinhib_spec.rnd_mean=0.25;	
+	fbinhib_spec.rnd_var=0.2;	
+
+	// inhib proj
+	inhib_spec.proj="full";	
+	inhib_spec.rnd_type="uniform" ;	
+	inhib_spec.rnd_mean=0.5;	
+	inhib_spec.rnd_var=0.f;	
+	
+	inhibinhib_spec.proj="full";	
+	inhibinhib_spec.rnd_type="uniform" ;	
+	inhibinhib_spec.rnd_mean=0.2;	
+	inhibinhib_spec.rnd_var=0.f;	
+
 	netw.build();
 
 }
@@ -100,7 +128,7 @@ void draw(){
 
 	pushMatrix();
 	translate(100,100);
-	drawTimeSeries(input_layer.getBuffers()[0].array(), 2, 1, 0);
+	drawTimeSeries(input_layer.getBuffers()[2].array(), 2, 1, 0);
 	popMatrix();
 
 	pushMatrix();
@@ -110,12 +138,12 @@ void draw(){
 
 	pushMatrix();
 	translate(100,300);
-	drawTimeSeries(input_layer.getBuffers()[2].array(), 2, 1, 0);
+	drawTimeSeries(input_layer.getBuffers()[0].array(), 2, 1, 0);
 	popMatrix();
 
 	pushMatrix();
 	translate(200,100);
-	drawTimeSeries(hidden_layer.getBuffers()[0].array(), 2, 1, 0);
+	drawTimeSeries(hidden_layer.getBuffers()[2].array(), 2, 1, 0);
 	popMatrix();
 
 	pushMatrix();
@@ -125,7 +153,7 @@ void draw(){
 
 	pushMatrix();
 	translate(200,300);
-	drawTimeSeries(hidden_layer.getBuffers()[2].array(), 2, 1, 0);
+	drawTimeSeries(hidden_layer.getBuffers()[0].array(), 2, 1, 0);
 	popMatrix();
 
 	pushMatrix();
