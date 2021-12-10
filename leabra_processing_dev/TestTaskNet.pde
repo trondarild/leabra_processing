@@ -43,7 +43,7 @@ class TestTaskNet{
     Connection PfcMaintD1_conn; // temporal context to keep track of sequence
 
     float[][] ID1_weights = zeros(inputvecsize, behaviours); // weights to trigger a particular D1 unit based on input
-    int quart_num = 10;
+    int quart_num = 20;
     NetworkSpec network_spec = new NetworkSpec(quart_num);
     Network netw; // network model to contain layers and connections
 
@@ -61,6 +61,7 @@ class TestTaskNet{
         excite_unit_spec.g_bar_e=1.0;
         excite_unit_spec.g_bar_l=0.1;
         excite_unit_spec.g_bar_i=0.40;
+        // excite_unit_spec.bias = 0.1;
 
         inhib_unit_spec.adapt_on = false;
         inhib_unit_spec.noisy_act = true;
@@ -72,7 +73,7 @@ class TestTaskNet{
         inhib_unit_spec.g_bar_i = 0.75;
 
         // connection spec
-        ffexcite_spec.proj="full";
+        ffexcite_spec.proj="1to1";
         ffexcite_spec.rnd_type="uniform" ;
         ffexcite_spec.rnd_mean=0.75;
         ffexcite_spec.rnd_var=0.0;
@@ -86,7 +87,7 @@ class TestTaskNet{
         
         // layers
         input_layer = new Layer(inputvecsize, new LayerSpec(false), excite_unit_spec, INPUT, "Input");
-        striatum_d1_layer = new Layer(behaviours, new LayerSpec(false), excite_unit_spec, HIDDEN, "StriatumD1");
+        striatum_d1_layer = new Layer(inputvecsize, new LayerSpec(false), excite_unit_spec, HIDDEN, "StriatumD1");
 
         // connections
         ID1_conn = new Connection(input_layer,  striatum_d1_layer, ffexcite_spec);
@@ -122,8 +123,9 @@ class TestTaskNet{
 
         float[][] tmp = zeros(2,inputvecsize);
         tmp[0] = input_layer.getOutput();
-        tmp[1][0] = striatum_d1_layer.getOutput()[0];
-        tmp[1][1] = striatum_d1_layer.getOutput()[1];
+        tmp[1] = striatum_d1_layer.getOutput();
+        // tmp[1][0] = striatum_d1_layer.getOutput()[0];
+        // tmp[1][1] = striatum_d1_layer.getOutput()[1];
         
         translate(10,650);
         pushMatrix();
