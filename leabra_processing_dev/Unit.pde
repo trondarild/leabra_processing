@@ -29,6 +29,7 @@ class Unit{
     float avg_l;
     float avg_s_eff;
     ArrayList<Float> ex_inputs = new ArrayList<Float>();
+    ArrayList<Float> inh_inputs = new ArrayList<Float>(); // TAT 2021-12-10: added inh inputs, different from internal inh
     float g_e;
     float I_net;
     float I_net_r;
@@ -172,6 +173,10 @@ class Unit{
 
     }
 
+    void add_inhibitory(float inp_inh){ // TAT 2021-12-10: for inh projections
+        this.inh_inputs.add(inp_inh);
+    }
+
     void update_avg_l(){
         this.spec.update_avg_l(this);
     }
@@ -267,7 +272,7 @@ class UnitSpec{
     float g_bar_e    = 1.0;     // excitatory maximum conductance
     float g_bar_l    = 0.1;     // leak maximum conductance
     float g_bar_i    = 1.0;     // inhibitory maximum conductance
-    // reversal potential
+    // reversal potential // TAT what is this?
     float e_rev_e    = 1.0 ;    // excitatory
     float e_rev_l    = 0.3 ;    // leak
     float e_rev_i    = 0.25;    // inhibitory
@@ -380,6 +385,11 @@ class UnitSpec{
             net_raw = sumArray(unit.ex_inputs);
             unit.ex_inputs.clear();
         }
+        if (unit.inh_inputs.size() > 0){ // TAT 2021-12-10: support for inh projections TODO check if this is valid
+            // computing net_raw, the total, instantaneous, inhbitory input for the neuron
+            net_raw -= sumArray(unit.ex_inputs);
+            unit.inh_inputs.clear();
+        }
 
         // updating net
         unit.g_e += dt_integ * this.dt_net() * (net_raw - unit.g_e);  // eq 2.16
@@ -412,7 +422,7 @@ class UnitSpec{
         """Update activity - "tick" or "step"
 
         unit    :  the unit to cycle
-        g_i     :  inhibitory input
+        g_i     :  inhibitory input; TAT: for WTA layer inhibition
         dt_integ:  integration time step, in ms.
         """ */
         if (unit.act_ext != 0) { // forced activity
@@ -578,7 +588,7 @@ class UnitSpec{
             
         
             I_net = (  gc_e * (this.e_rev_e - v_m_eff)
-                     + gc_i * (this.e_rev_i - v_m_eff)
+                     + gc_i * (this.e_rev_i - v_m_eff) // should this be subtracted?
                      + gc_l * (this.e_rev_l - v_m_eff)
                      - unit.adapt);
             v_m_eff += dt_integ/steps * this.dt_v_m() * I_net;

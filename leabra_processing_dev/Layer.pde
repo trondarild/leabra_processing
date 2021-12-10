@@ -138,7 +138,7 @@ class Layer{
 }
 
 class LayerSpec{
-    boolean lay_inhib = true; // activate inhibition?
+    boolean lay_inhib = true; // activate inhibition? (TAT: WTA inh between units)
 
     // time step constants:
     float fb_dt = 1/1.4;  // Integration constant for feed back inhibition
@@ -173,6 +173,7 @@ class LayerSpec{
 
     float inhibition(Layer layer){
         // """Compute the layer inhibition"""
+        // TAT 2021-12-10: this appears to only be for WTA inhibition
         if (this.lay_inhib) {
             // Calculate feed forward inhibition
             // netin = [u.g_e for u in layer.units]

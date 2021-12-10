@@ -173,7 +173,10 @@ class ConnectionSpec{
         for (Link link : connection.links){
             if (link.post.act_ext ==0){ // activity not forced
                 float scaled_act = this.wt_scale_abs * connection.wt_scale() * link.wt * link.pre.act;
-                link.post.add_excitatory(scaled_act);
+                if(this.inhib) // TAT 2021-12-10: support for inhibitory projections
+                    link.post.add_inhibitory(scaled_act);
+                else
+                    link.post.add_excitatory(scaled_act);
             }
         }
     }
