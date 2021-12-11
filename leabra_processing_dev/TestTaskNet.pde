@@ -73,7 +73,7 @@ class TestTaskNet{
         inhib_unit_spec.g_bar_i = 0.75;
 
         // connection spec
-        ffexcite_spec.proj="1to1";
+        ffexcite_spec.proj="full";
         ffexcite_spec.rnd_type="uniform" ;
         ffexcite_spec.rnd_mean=0.75;
         ffexcite_spec.rnd_var=0.0;
@@ -87,7 +87,7 @@ class TestTaskNet{
         
         // layers
         input_layer = new Layer(inputvecsize, new LayerSpec(false), excite_unit_spec, INPUT, "Input");
-        striatum_d1_layer = new Layer(inputvecsize, new LayerSpec(false), excite_unit_spec, HIDDEN, "StriatumD1");
+        striatum_d1_layer = new Layer(behaviours, new LayerSpec(false), excite_unit_spec, HIDDEN, "StriatumD1");
 
         // connections
         ID1_conn = new Connection(input_layer,  striatum_d1_layer, ffexcite_spec);
@@ -117,22 +117,39 @@ class TestTaskNet{
         pushMatrix();
         
         pushMatrix();
-        translate(10,10);
+        translate(10,20);
         text(modelname, 0, 0);
         popMatrix();
 
-        float[][] tmp = zeros(2,inputvecsize);
-        tmp[0] = input_layer.getOutput();
-        tmp[1] = striatum_d1_layer.getOutput();
+        float[][] inp_viz = zeros(1,inputvecsize);
+        inp_viz[0] = input_layer.getOutput();
+        float[][] d1_viz = zeros(1,inputvecsize);
+        
+        d1_viz[0] = striatum_d1_layer.getOutput();
         // tmp[1][0] = striatum_d1_layer.getOutput()[0];
         // tmp[1][1] = striatum_d1_layer.getOutput()[1];
         
-        translate(10,650);
+        translate(10,50);
         pushMatrix();
-        rotate(-HALF_PI);
-        drawColGrid(0,0, 15, multiply(200, tmp));
-        popMatrix();
+            //rotate(-HALF_PI);
+            pushMatrix();
+            text(input_layer.name, 0, 0);
+            pushMatrix();
+            translate(100, -10);
+            drawColGrid(0,0, 10, multiply(200, inp_viz));
+            popMatrix();
+            popMatrix();
+
+            translate(0, 20);
+            pushMatrix();
+            text(striatum_d1_layer.name, 0,0);
+            pushMatrix();
+            translate(100, -10);
+            drawColGrid(0,0, 10, multiply(200, d1_viz));
+            popMatrix();
+            popMatrix();
         
+        popMatrix();
         popMatrix();
     }
 }

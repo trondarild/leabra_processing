@@ -6,11 +6,12 @@ import java.util.Map;
 
 
 
-TestHiddenLayer test = new TestHiddenLayer();
-
+// TestHiddenLayer test = new TestHiddenLayer();
+// TestInhibition test = new TestInhibition();
+TestTaskNet test = new TestTaskNet();
 
 void setup(){
-	size(400, 600);
+	size(600, 1000);
 	// unit.show_config();
 	
 

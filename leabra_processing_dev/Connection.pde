@@ -94,7 +94,7 @@ class Connection{
     }
 
     void weights(float[][] value){
-        // """Override the links weights"""
+        // """Override the links weights""" TAT: use this to manually set connections to activate beh.
         if (this.spec.proj.toLowerCase() == "1to1"){
             assert (value[0].length == this.links.size());
             //for wt, link in zip(value, this.links):

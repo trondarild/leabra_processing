@@ -34,7 +34,7 @@ class TestInhibition{
     Connection ii_conn; // = new Connection(inhib_layer,  inhib_layer,  inhibinhib_spec);
 
     // network
-    int quart_num = 20;
+    int quart_num = 10;
     NetworkSpec network_spec = new NetworkSpec(quart_num);
     Layer[] layers =  {input_layer, inhib_layer, hidden_layer};
     Connection[] conns = {IH_conn}; //,
@@ -126,7 +126,7 @@ class TestInhibition{
     void tick(){
         FloatList inpvals = new FloatList();
         inpvals.set(numunits-1, 0.0); // set dim of list
-        inpvals.set((int)random(0, numunits), 0.5 * sig.getOutput());
+        inpvals.set((int)random(0, numunits), 0.25 * sig.getOutput());
         inputs.put("Input", inpvals);
         if(cyc++ % quart_num == 0)
             netw.set_inputs(inputs);
