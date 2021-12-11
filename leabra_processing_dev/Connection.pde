@@ -106,15 +106,16 @@ class Connection{
         }
         else{  // proj == 'full'
             // link_it = iter(this.links)  // link iterator
-            assert (value.length * value[0].length == this.links.size());
+            assert (value.length * value[0].length == this.links.size()) : 
+              "inp length = " + value.length * value[0].length + "; links size = " + this.links.size();
             // for i, pre_u in enumerate(this.pre.units):
             //     for j, post_u in enumerate(this.post.units):
             //         link = next(link_it)
             //         link.wt = value[i][j]
             //         link.fwt = this.spec.sig_inv(value[i][j])
-            int l = 0;
-            for (int j = 0; j < pre.units.length; ++j) {
-                for (int i = 0; i < post.units.length; ++i) {
+            // int l = 0;
+            for (int j = 0; j < post.units.length; ++j) { // targets
+                for (int i = 0; i < pre.units.length; ++i) { // sources
                     links.get(i).wt  = value[j][i];
                     links.get(i).fwt = this.spec.sig_inv(value[j][i]);
                 }

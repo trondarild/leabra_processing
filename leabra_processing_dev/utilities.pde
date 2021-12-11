@@ -615,6 +615,15 @@ float[] mask_array(float[] a, int[] keep){
   return retval;
 }
 
+FloatList arrayToList(float[] a){
+  FloatList retval = new FloatList(a.length);
+
+  for (int i = 0; i < a.length; ++i) {
+    retval.append(a[i]);
+  }
+  return retval;
+}
+
 /**
 */
 float[][] flipMatrixHor(float[][] m){

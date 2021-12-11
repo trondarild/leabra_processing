@@ -13,7 +13,6 @@ TestTaskNet test = new TestTaskNet();
 void setup(){
 	size(600, 1000);
 	// unit.show_config();
-	
 
 }
 

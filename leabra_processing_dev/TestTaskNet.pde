@@ -50,6 +50,14 @@ class TestTaskNet{
     Map<String, FloatList> inputs = new HashMap<String, FloatList>();
     boolean phase = true;
     int cyc = 0;
+    int inp_ix = 0;
+    float[][] testinputs = {
+        {0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
+        {0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
+        {0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0}
+    };
 
     TestTaskNet(){
         // unit
@@ -92,6 +100,7 @@ class TestTaskNet{
         // connections
         ID1_conn = new Connection(input_layer,  striatum_d1_layer, ffexcite_spec);
 
+        this.setWeights(); // test setting weights which are sums of valid input combinations
         Layer[] layers =  {input_layer, striatum_d1_layer};
 	    Connection[] conns = {ID1_conn};
 
@@ -101,16 +110,19 @@ class TestTaskNet{
     }
 
     void tick(){
-        FloatList inpvals = new FloatList();
-        inpvals.set(inputvecsize - 1, 0.0); // set dim of list
-        inpvals.set((int)random(0, inputvecsize), 0.5 * sig.getOutput());
-        inputs.put("Input", inpvals);
-
-        if(cyc++ % quart_num == 0)
+        //FloatList inpvals = new FloatList();
+        //inpvals.set(inputvecsize - 1, 0.0); // set dim of list
+        //inpvals.set((int)random(0, inputvecsize), 0.5 * sig.getOutput());
+        
+        if(cyc % quart_num == 0){
+            FloatList inpvals = arrayToList(testinputs[inp_ix++ % testinputs.length]);
+            inputs.put("Input", inpvals);
             netw.set_inputs(inputs);
+        }
         netw.cycle();
     
         sig.tick();
+        cyc++;
     }
 
     void draw(){
@@ -151,6 +163,14 @@ class TestTaskNet{
         
         popMatrix();
         popMatrix();
+    }
+
+    void setWeights(){
+        float[][] tstweights = {
+            {0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0},
+            {0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0}
+        };
+        ID1_conn.weights(multiply(0.1, tstweights));
     }
 }
 
