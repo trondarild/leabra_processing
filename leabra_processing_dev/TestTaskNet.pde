@@ -37,11 +37,13 @@ class TestTaskNet{
     ConnectionSpec ffexcite_spec  = new ConnectionSpec();
     ConnectionSpec ffexcite_1to1_spec  = new ConnectionSpec();
     ConnectionSpec inhib_spec  = new ConnectionSpec(); 
+    ConnectionSpec thal_inhib_spec  = new ConnectionSpec(); 
 
     Connection ID1_conn; // input to striatum D1 - go
     Connection ID2_conn; // input to striatum D1 - nogo
     Connection D1GPi_conn; // D1 to GPi "direct"
     Connection D2Gpe_conn; // D2 to GPe "indirect"
+    Connection GpeGpi_conn; // GPe to GPi "indirect"
     Connection GPiThal_conn; // GPi to thalamus
     Connection ThalPfcGate_conn; // Thalamus to PFC gate layer 4
     Connection PfcGateMaint_conn; // PFC gate to maintenance layer 2,3/5.6
@@ -49,7 +51,7 @@ class TestTaskNet{
     Connection PfcMaintD1_conn; // temporal context to keep track of sequence
 
     float[][] ID1_weights = zeros(inputvecsize, behaviours); // weights to trigger a particular D1 unit based on input
-    int quart_num = 15;
+    int quart_num = 20;
     NetworkSpec network_spec = new NetworkSpec(quart_num);
     Network netw; // network model to contain layers and connections
 
@@ -94,7 +96,7 @@ class TestTaskNet{
         bias_unit_spec.g_bar_e = 1.0;; //g_bar_e=1.0;
         bias_unit_spec.g_bar_l = 0.1;; //g_bar_l=0.1;
         bias_unit_spec.g_bar_i = 0.75;; //g_bar_i=0.40;
-        bias_unit_spec.bias = 0.025;
+        bias_unit_spec.bias = 0.075;
 
         // connection spec
         ffexcite_spec.proj="full";
@@ -113,6 +115,12 @@ class TestTaskNet{
         inhib_spec.rnd_var=0.f;	
         inhib_spec.inhib = true;
 
+        thal_inhib_spec.proj="1to1";	
+        thal_inhib_spec.rnd_type="uniform" ;	
+        thal_inhib_spec.rnd_mean=0.15;	// less inh prevents thalamus from just going dark
+        thal_inhib_spec.rnd_var=0.f;	
+        thal_inhib_spec.inhib = true;
+
 
 
         
@@ -121,14 +129,22 @@ class TestTaskNet{
         striatum_d1_layer = new Layer(behaviours, new LayerSpec(true), inhib_unit_spec, HIDDEN, "StriatumD1");
         striatum_d2_layer = new Layer(behaviours, new LayerSpec(true), inhib_unit_spec, HIDDEN, "StriatumD2");
         gpe_layer = new Layer(behaviours, new LayerSpec(false), bias_unit_spec, HIDDEN, "GPe");
+        gpi_snr_layer = new Layer(behaviours, new LayerSpec(false), bias_unit_spec, HIDDEN, "GPi-SNr");
+        thalamus_layer = new Layer(behaviours, new LayerSpec(false), bias_unit_spec, HIDDEN, "Thalamus");
 
         // connections
         ID1_conn = new Connection(input_layer,  striatum_d1_layer, ffexcite_spec);
         ID2_conn = new Connection(input_layer,  striatum_d2_layer, ffexcite_spec);
         D2Gpe_conn = new Connection(striatum_d2_layer,  gpe_layer, inhib_spec);
+        D1GPi_conn = new Connection(striatum_d1_layer, gpi_snr_layer, inhib_spec);
+        GpeGpi_conn = new Connection(gpe_layer, gpi_snr_layer, inhib_spec);
+        GPiThal_conn = new Connection(gpi_snr_layer, thalamus_layer, thal_inhib_spec);
+        
         this.setWeights(); // test setting weights which are sums of valid input combinations
-        Layer[] layers =  {input_layer, striatum_d1_layer, striatum_d2_layer, gpe_layer};
-	    Connection[] conns = {ID2_conn, D2Gpe_conn}; //{ID1_conn, ID2_conn}; //, D2Gpe_conn};
+        Layer[] layers =  {input_layer, striatum_d1_layer, striatum_d2_layer, gpe_layer,
+                            gpi_snr_layer, thalamus_layer};
+	    Connection[] conns = {ID1_conn, ID2_conn, D2Gpe_conn,
+                                D1GPi_conn, GPiThal_conn};
 
         netw = new Network(network_spec, layers, conns);
         netw.build();
@@ -168,8 +184,14 @@ class TestTaskNet{
         float[][] d2_viz = zeros(1,inputvecsize);
         d2_viz[0] = striatum_d2_layer.getOutput();
 
-        float[][] gpe_viz = zeros(1,inputvecsize);
+        float[][] gpe_viz = zeros(1,behaviours);
         gpe_viz[0] = gpe_layer.getOutput();
+
+        float[][] gpi_viz = zeros(1,behaviours);
+        gpi_viz[0] = gpi_snr_layer.getOutput();
+
+        float[][] thal_viz = zeros(1,behaviours);
+        thal_viz[0] = thalamus_layer.getOutput();
         // tmp[1][0] = striatum_d1_layer.getOutput()[0];
         // tmp[1][1] = striatum_d1_layer.getOutput()[1];
         
@@ -202,12 +224,30 @@ class TestTaskNet{
             popMatrix();
             popMatrix();
 
-            translate(0, 40);
+            translate(0, 20);
             pushMatrix();
             text(gpe_layer.name, 0,0);
             pushMatrix();
             translate(100, -10);
             drawColGrid(0,0, 10, multiply(200, gpe_viz));
+            popMatrix();
+            popMatrix();
+
+            translate(0, 20);
+            pushMatrix();
+            text(gpi_snr_layer.name, 0,0);
+            pushMatrix();
+            translate(100, -10);
+            drawColGrid(0,0, 10, multiply(200, gpi_viz));
+            popMatrix();
+            popMatrix();
+
+            translate(0, 20);
+            pushMatrix();
+            text(thalamus_layer.name, 0,0);
+            pushMatrix();
+            translate(100, -10);
+            drawColGrid(0,0, 10, multiply(200, thal_viz));
             popMatrix();
             popMatrix();
         

@@ -23,6 +23,7 @@ class Link{
 }
 
 class Connection{
+    String name;
     Layer pre;
     Layer post;
     ArrayList<Link> links = new ArrayList<Link>();
@@ -37,8 +38,11 @@ class Connection{
             post_layer  the layer receiving the activity.
         """
         */ 
+        
         this.pre   = pre_layer;
         this.post  = post_layer;
+
+        name = pre.name + " -> " + post.name;
         
         this.spec  = spec;
         if (this.spec == null)
@@ -107,7 +111,7 @@ class Connection{
         else{  // proj == 'full'
             // link_it = iter(this.links)  // link iterator
             assert (value.length * value[0].length == this.links.size()) : 
-              "inp length = " + value.length * value[0].length + "; links size = " + this.links.size();
+              this.name + ": inp length = " + value.length * value[0].length + "; links size = " + this.links.size();
             // for i, pre_u in enumerate(this.pre.units):
             //     for j, post_u in enumerate(this.post.units):
             //         link = next(link_it)
