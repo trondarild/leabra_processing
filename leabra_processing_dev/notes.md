@@ -1,4 +1,6 @@
 # Notes
+* 2021-12-13 what should the behaviour of the GPe be? If D2 pathway inhibits everything that is -not- the chosen behaviour, then GPe should maybe have an inhibt output to STN for the chosen behaviour, which makes STN excite inhibition for all except chosen in GPi
+
 ## Inputs per task
 ### Stop signal task
 1. ctx: 001 pos: 01 shp:1000 color:0100 num:0000 out:01 // right arrow

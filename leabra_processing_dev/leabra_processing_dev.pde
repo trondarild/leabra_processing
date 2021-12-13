@@ -7,7 +7,7 @@ import java.util.Map;
 
 
 // TestHiddenLayer test = new TestHiddenLayer();
-// TestInhibition test = new TestInhibition();
+//TestInhibition test = new TestInhibition();
 TestTaskNet test = new TestTaskNet();
 
 void setup(){

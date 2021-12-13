@@ -43,6 +43,7 @@ class Layer{
         units = new Unit[size];
         for (int i = 0; i < size; ++i) {
             units[i] = new Unit(unit_spec, genre);
+            units[i].name = this.name + "_" + i;
         }
         avg_act_p_eff = spec.avg_act_targ_init;
 

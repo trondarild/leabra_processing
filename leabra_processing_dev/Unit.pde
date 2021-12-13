@@ -15,6 +15,7 @@ static int HIDDEN = 1;
 static int OUTPUT = 2;
 
 class Unit{
+    String name;
     UnitSpec spec;
     int genre = INPUT;
     Buffer buffer;
@@ -387,7 +388,7 @@ class UnitSpec{
         }
         if (unit.inh_inputs.size() > 0){ // TAT 2021-12-10: support for inh projections TODO check if this is valid
             // computing net_raw, the total, instantaneous, inhbitory input for the neuron
-            net_raw -= sumArray(unit.ex_inputs);
+            net_raw -= sumArray(unit.inh_inputs);
             unit.inh_inputs.clear();
         }
 
@@ -466,7 +467,7 @@ class UnitSpec{
             float gc_l = this.g_bar_l * this.g_l;
             float g_e_thr = (  gc_i * (this.e_rev_i - this.act_thr)
                        + gc_l * (this.e_rev_l - this.act_thr)
-                       - unit.adapt) / (this.act_thr - this.e_rev_e);
+                       - unit.adapt + this.bias) / (this.act_thr - this.e_rev_e);
 
             new_act = act_fun(gc_e - g_e_thr);  // gc_e == unit.net
             // print('ABVTHR {} net={} {}\n       new_act={}'.format(unit.v_m_eq, gc_e, g_e_thr, new_act))
@@ -543,7 +544,7 @@ class UnitSpec{
             float gc_l = this.g_bar_l * this.g_l;
             float g_e_thr = (  gc_i * (this.e_rev_i - this.act_thr)
                        + gc_l * (this.e_rev_l - this.act_thr)
-                       - unit.adapt) / (this.act_thr - this.e_rev_e);
+                       - unit.adapt + this.bias) / (this.act_thr - this.e_rev_e);
 
             new_act = act_fun(gc_e - g_e_thr);  // gc_e == unit.net
             // print('ABVTHR {} net={} {}\n       new_act={}'.format(unit.v_m_eq, gc_e, g_e_thr, new_act))
@@ -588,12 +589,14 @@ class UnitSpec{
             
         
             I_net = (  gc_e * (this.e_rev_e - v_m_eff)
-                     + gc_i * (this.e_rev_i - v_m_eff) // should this be subtracted?
+                     + gc_i * (this.e_rev_i - v_m_eff) // TAT should this be subtracted?
                      + gc_l * (this.e_rev_l - v_m_eff)
-                     - unit.adapt);
+                     - unit.adapt //);
+                     + this.bias); // TAT
             v_m_eff += dt_integ/steps * this.dt_v_m() * I_net;
         }
-        // println("integrate_I_net: I_net= " + I_net);
+        // if(this.bias == 0)
+        // println("integrate_I_net: I_net no bias= " + I_net + "; w bias: " + (I_net+this.bias));
         return I_net;
     }
 
