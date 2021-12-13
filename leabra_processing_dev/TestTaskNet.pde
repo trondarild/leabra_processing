@@ -7,6 +7,7 @@ class TestTaskNet{
     int inputvecsize = 24; // ctx:3 reward:1 pos:2 color:4 number:10
     int behaviours = 2; // TODO update when calc number of discrete behaviours, including gating ones
     int outputvecsize = 4;
+    int stn_size = 9; // same as Wiecki and Frank 2012
 
     String[] lognames = {};
     SignalGenerator sig = new SignalGenerator(eTickSquare, 50, 40, 100);
@@ -131,6 +132,7 @@ class TestTaskNet{
         gpe_layer = new Layer(behaviours, new LayerSpec(false), bias_unit_spec, HIDDEN, "GPe");
         gpi_snr_layer = new Layer(behaviours, new LayerSpec(false), bias_unit_spec, HIDDEN, "GPi-SNr");
         thalamus_layer = new Layer(behaviours, new LayerSpec(false), bias_unit_spec, HIDDEN, "Thalamus");
+        // TODO: stn_layer = new Layer(stn_size, new LayerSpec(false), excite_unit_spec, HIDDEN, "STN");
 
         // connections
         ID1_conn = new Connection(input_layer,  striatum_d1_layer, ffexcite_spec);
