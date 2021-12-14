@@ -9,6 +9,7 @@ import java.util.Map;
 // TestHiddenLayer test = new TestHiddenLayer();
 //TestInhibition test = new TestInhibition();
 TestTaskNet test = new TestTaskNet();
+//TestForceActivity test = new TestForceActivity();
 
 void setup(){
 	size(600, 1000);
