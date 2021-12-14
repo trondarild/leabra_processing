@@ -20,7 +20,7 @@ class NetworkSpec{
 class Network{
     // """Leabra Network class"""
     NetworkSpec spec;
-
+    int trial_length = 5; // number of quarters per trial
     int cycle_count;
     int cycle_tot;
     int quarter_nb;
@@ -123,7 +123,7 @@ class Network{
         """ */
         if (this.cycle_count == this.spec.quarter_size) { // a quarter just ended
             this.quarter_nb += 1;
-            if (this.quarter_nb == 5){ // a trial just ended
+            if (this.quarter_nb == this.trial_length){ // 5){ // a trial just ended
                 this.trial_count += 1;
                 this.quarter_nb = 1;
             }
@@ -134,21 +134,23 @@ class Network{
             for (Connection connection : this.connections)
                connection.compute_netin_scaling();
 
-            if (this.quarter_nb == 1){ // start of trial
+            if (this.quarter_nb == 1){ // start of trial, // TAT: set inputs only on first quarter
                 // reset all layers
-                if (this.quarter_nb == 1)
+                if (this.quarter_nb == 1) // TAT: could this "if" be removed?
                     for (Layer layer : this.layers)
-                        layer.trial_init();
+                        layer.trial_init(); // will reset units in layer
                 // force activities for inputs
                 // for name, activities in this._inputs.items():
                 // inputs.forEach((k, v) ->  this.get_layer(k).force_activity(Floats.toArray(v)));
                 for (Map.Entry<String, FloatList> entry : inputs.entrySet()) {
+                    // println("network: precycle: ");
+                    // println(entry.getValue().toString());
                     this.get_layer(entry.getKey()).force_activity(entry.getValue());
                 }
                    
             }
             else if (this.quarter_nb == 4) // start of plus phase
-                // force activities for outputs
+                // force activities for outputs - TAT for prediction error and computing weight changes?
                 // for name, activities in this._outputs.items():
                 //     this._get_layer(name).force_activity(activities)
                 for (Map.Entry<String, FloatList> entry : outputs.entrySet()) {
@@ -160,10 +162,10 @@ class Network{
     void post_cycle(){
         // """Same as _pre_cycle, but after the cycle has executed"""
         if (this.cycle_count == this.spec.quarter_size){ // end of a quarter
-            if (this.quarter_nb == 3) // end of minus phase
+            if (this.quarter_nb == 3) // end of minus phase (TAT: prediction?)
                 this.end_minus_phase();
 
-            if (this.quarter_nb == 4) // end of plus phase
+            if (this.quarter_nb == 4) // end of plus phase (TAT: sensory pred error?)
                 this.end_plus_phase();
         }
     }
@@ -239,6 +241,11 @@ class Network{
                 unit.update_avg_l();
 
         this.phase = "minus";
+    }
+
+    boolean accept_input(){
+        return this.cycle_count == this.spec.quarter_size &&
+            this.quarter_nb == this.trial_length-1;
     }
 
 
