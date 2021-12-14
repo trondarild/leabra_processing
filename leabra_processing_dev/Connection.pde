@@ -117,11 +117,12 @@ class Connection{
             //         link = next(link_it)
             //         link.wt = value[i][j]
             //         link.fwt = this.spec.sig_inv(value[i][j])
-            // int l = 0;
+            int l = 0;
             for (int j = 0; j < post.units.length; ++j) { // targets
                 for (int i = 0; i < pre.units.length; ++i) { // sources
-                    links.get(i).wt  = value[j][i];
-                    links.get(i).fwt = this.spec.sig_inv(value[j][i]);
+                    links.get(l).wt  = value[j][i];
+                    links.get(l).fwt = this.spec.sig_inv(value[j][i]);
+                    l++;
                 }
             }
         }
