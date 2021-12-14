@@ -3,6 +3,7 @@
 import java.lang.Math; // pow
 
 class Link{
+    String name;
     Unit pre;
     Unit post;
     float wt = 0;
@@ -11,6 +12,7 @@ class Link{
     int[] index;
     int key;
     Link(Unit pre_unit, Unit post_unit, float w0, float fw0, int[] index){
+        this.name = pre_unit.name + " -> " + post_unit.name;
         this.pre = pre_unit;
         this.post = post_unit;
         this.wt = w0;
@@ -98,7 +100,9 @@ class Connection{
     }
 
     void weights(float[][] value){
-        // """Override the links weights""" TAT: use this to manually set connections to activate beh.
+        // """Override the links weights""" 
+        // value: source as columns, destination as rows
+        // TAT: use this to manually set connections to activate beh.
         if (this.spec.proj.toLowerCase() == "1to1"){
             assert (value[0].length == this.links.size());
             //for wt, link in zip(value, this.links):
@@ -118,8 +122,8 @@ class Connection{
             //         link.wt = value[i][j]
             //         link.fwt = this.spec.sig_inv(value[i][j])
             int l = 0;
-            for (int j = 0; j < post.units.length; ++j) { // targets
-                for (int i = 0; i < pre.units.length; ++i) { // sources
+            for (int j = 0; j < pre.units.length; ++j) { // targets
+                for (int i = 0; i < post.units.length; ++i) { // sources
                     links.get(l).wt  = value[j][i];
                     links.get(l).fwt = this.spec.sig_inv(value[j][i]);
                     l++;
@@ -127,6 +131,7 @@ class Connection{
             }
         }
     }
+
 
     void learn(){
         this.spec.learn(this);
