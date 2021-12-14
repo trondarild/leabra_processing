@@ -5,7 +5,7 @@
 class TestTaskNet{
     String modelname = "Task net test";
     int inputvecsize = 24; // ctx:3 reward:1 pos:2 color:4 number:10
-    int behaviours = 2; // TODO update when calc number of discrete behaviours, including gating ones
+    int behaviours = 4; // TODO update when calc number of discrete behaviours, including gating ones
     int outputvecsize = 4;
     int stn_size = 9; // same as Wiecki and Frank 2012
     int acc_size = 1; // same as Wiecki and Frank 2012
@@ -198,7 +198,7 @@ class TestTaskNet{
         
         //if(cyc % (quart_num * netw.trial_length) == 0){
         if(netw.accept_input()){
-            println();
+            //println();
             //printArray("input", testinputs[inp_ix % testinputs.length]);
             FloatList inpvals = arrayToList(testinputs[inp_ix++ % testinputs.length]);
             //println("floatlist: " + inpvals.toString());
@@ -221,7 +221,6 @@ class TestTaskNet{
 
         float[][] inp_viz = zeros(1,inputvecsize);
         inp_viz[0] = input_layer.getOutput();
-        printArray("input layer output", inp_viz[0]);
         
         float[][] d1_viz = zeros(1,inputvecsize);
         d1_viz[0] = striatum_d1_layer.getOutput();
@@ -328,14 +327,17 @@ class TestTaskNet{
         // ctx: 010 pos: 10 shp:1000 color:1000 num:1000000000 
         float[][] tstweights_d1 = {
             {0, 0, 0,  0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 1, 0, 1, 0, 1, 0, 1, 0,  0}, // odd, press left
-            {0, 0, 0,  0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 1, 0, 1, 0, 1, 0, 1, 0, 1,  0} // even, press right
-            
+            {0, 0, 0,  0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 1, 0, 1, 0, 1, 0, 1, 0, 1,  0}, // even, press right
+            {0, 0, 0,  0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0},
+            {0, 0, 0,  0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0}
         };
         ID1_conn.weights(transpose(multiply(0.71, tstweights_d1)));
 
         float[][] tstweights_d2 = {
             {0, 0, 0,  0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 1, 0, 1, 0, 1, 0, 1, 0, 1,  0}, // odd, press left
-            {0, 0, 0,  0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 1, 0, 1, 0, 1, 0, 1, 0,  0} // even, press right
+            {0, 0, 0,  0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 1, 0, 1, 0, 1, 0, 1, 0,  0}, // even, press right
+            {0, 0, 0,  0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0},
+            {0, 0, 0,  0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0}
         };
         ID2_conn.weights(transpose(multiply(0.71, tstweights_d2)));
     }
