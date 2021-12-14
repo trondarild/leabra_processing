@@ -8,6 +8,7 @@ class TestTaskNet{
     int behaviours = 2; // TODO update when calc number of discrete behaviours, including gating ones
     int outputvecsize = 4;
     int stn_size = 9; // same as Wiecki and Frank 2012
+    int acc_size = 1; // same as Wiecki and Frank 2012
 
     String[] lognames = {};
     SignalGenerator sig = new SignalGenerator(eTickSquare, 50, 40, 100);
@@ -36,6 +37,7 @@ class TestTaskNet{
 
     // connections
     ConnectionSpec ffexcite_spec  = new ConnectionSpec();
+    ConnectionSpec ffexcite_rnd_spec  = new ConnectionSpec();
     ConnectionSpec ffexcite_1to1_spec  = new ConnectionSpec();
     ConnectionSpec inhib_spec  = new ConnectionSpec(); 
     ConnectionSpec thal_inhib_spec  = new ConnectionSpec(); 
@@ -45,6 +47,8 @@ class TestTaskNet{
     Connection D1GPi_conn; // D1 to GPi "direct"
     Connection D2Gpe_conn; // D2 to GPe "indirect"
     Connection GpeGpi_conn; // GPe to GPi "indirect"
+    Connection AccStn_conn; // ACC to STN "hyperdirect"
+    Connection StnGpi_conn; // STN to GPi "hyperdirect"
     Connection GPiThal_conn; // GPi to thalamus
     Connection ThalPfcGate_conn; // Thalamus to PFC gate layer 4
     Connection PfcGateMaint_conn; // PFC gate to maintenance layer 2,3/5.6
@@ -52,7 +56,7 @@ class TestTaskNet{
     Connection PfcMaintD1_conn; // temporal context to keep track of sequence
 
     float[][] ID1_weights = zeros(inputvecsize, behaviours); // weights to trigger a particular D1 unit based on input
-    int quart_num = 20;
+    int quart_num = 25;
     NetworkSpec network_spec = new NetworkSpec(quart_num);
     Network netw; // network model to contain layers and connections
 
@@ -60,12 +64,40 @@ class TestTaskNet{
     boolean phase = true;
     int cyc = 0;
     int inp_ix = 0;
+    //float[][] testinputs = {
+    //    {0, 1,  0, 1, 0,  1, 0, 0, 0,  1, 0, 0, 0,  1, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0}, // even: no
+    //    {0, 1,  0, 1, 0,  1, 0, 0, 0,  1, 0, 0, 0,  0, 0, 1, 0, 0, 0, 0, 0, 0, 0,  0}, // 
+    //    {0, 1,  0, 1, 0,  1, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0, 1, 0, 0, 0, 0, 0,  0}, // 
+    //    {0, 1,  0, 1, 0,  1, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0, 0, 0, 1, 0, 0, 0,  0}, // 
+    //    {0, 1,  0, 1, 0,  1, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 1, 0,  0},
+//
+    //    {0, 1,  0, 1, 0,  1, 0, 0, 0,  1, 0, 0, 0,  0, 1, 0, 0, 0, 0, 0, 0, 0, 0,  0}, // even: yes
+    //    {0, 1,  0, 1, 0,  1, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 1, 0, 0, 0, 0, 0, 0,  0}, //
+    //    {0, 1,  0, 1, 0,  1, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0, 0, 1, 0, 0, 0, 0,  0}, //
+    //    {0, 1,  0, 1, 0,  1, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 1, 0, 0,  0}, //
+    //    {0, 1,  0, 1, 0,  1, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 1,  0}
+    //
+    //};
+
     float[][] testinputs = {
-        {0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
-        {0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
-        {0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0}
+        
+        {0, 1,  0, 1, 0,  1, 0, 0, 0,  1, 0, 0, 0,  1, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0}, // even: no
+        {0, 1,  0, 1, 0,  1, 0, 0, 0,  1, 0, 0, 0,  0, 1, 0, 0, 0, 0, 0, 0, 0, 0,  0}, // even: yes
+        
+        {0, 1,  0, 1, 0,  1, 0, 0, 0,  1, 0, 0, 0,  0, 0, 1, 0, 0, 0, 0, 0, 0, 0,  0}, // 
+        {0, 1,  0, 1, 0,  1, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 1, 0, 0, 0, 0, 0, 0,  0}, //
+        
+        {0, 1,  0, 1, 0,  1, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0, 1, 0, 0, 0, 0, 0,  0}, // 
+        {0, 1,  0, 1, 0,  1, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0, 0, 1, 0, 0, 0, 0,  0}, //
+        
+        {0, 1,  0, 1, 0,  1, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0, 0, 0, 1, 0, 0, 0,  0}, // 
+        {0, 1,  0, 1, 0,  1, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 1, 0, 0,  0}, //
+        
+        {0, 1,  0, 1, 0,  1, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 1, 0,  0},
+        {0, 1,  0, 1, 0,  1, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 1,  0}
+
+
+
     };
 
     TestTaskNet(){
@@ -105,6 +137,11 @@ class TestTaskNet{
         ffexcite_spec.rnd_mean=0.75;
         ffexcite_spec.rnd_var=0.0;
 
+        ffexcite_rnd_spec.proj="full";
+        ffexcite_rnd_spec.rnd_type="uniform" ;
+        ffexcite_rnd_spec.rnd_mean=0.15;
+        ffexcite_rnd_spec.rnd_var=0.2;
+
         ffexcite_1to1_spec.proj="1to1";
         ffexcite_1to1_spec.rnd_type="uniform" ;
         ffexcite_1to1_spec.rnd_mean=0.75;
@@ -122,18 +159,16 @@ class TestTaskNet{
         thal_inhib_spec.rnd_var=0.f;	
         thal_inhib_spec.inhib = true;
 
-
-
-        
         // layers
         input_layer = new Layer(inputvecsize, new LayerSpec(false), excite_unit_spec, INPUT, "Input");
-        striatum_d1_layer = new Layer(behaviours, new LayerSpec(true), inhib_unit_spec, HIDDEN, "StriatumD1");
-        striatum_d2_layer = new Layer(behaviours, new LayerSpec(true), inhib_unit_spec, HIDDEN, "StriatumD2");
+        striatum_d1_layer = new Layer(behaviours, new LayerSpec(false), inhib_unit_spec, HIDDEN, "StriatumD1");
+        striatum_d2_layer = new Layer(behaviours, new LayerSpec(false), inhib_unit_spec, HIDDEN, "StriatumD2");
         gpe_layer = new Layer(behaviours, new LayerSpec(false), bias_unit_spec, HIDDEN, "GPe");
         gpi_snr_layer = new Layer(behaviours, new LayerSpec(false), bias_unit_spec, HIDDEN, "GPi-SNr");
         thalamus_layer = new Layer(behaviours, new LayerSpec(false), bias_unit_spec, HIDDEN, "Thalamus");
-        // TODO: stn_layer = new Layer(stn_size, new LayerSpec(false), excite_unit_spec, HIDDEN, "STN");
-
+        stn_layer = new Layer(stn_size, new LayerSpec(false), excite_unit_spec, HIDDEN, "STN");
+        acc_layer = new Layer(acc_size, new LayerSpec(false), excite_unit_spec, HIDDEN, "ACC");
+        
         // connections
         ID1_conn = new Connection(input_layer,  striatum_d1_layer, ffexcite_spec);
         ID2_conn = new Connection(input_layer,  striatum_d2_layer, ffexcite_spec);
@@ -141,12 +176,15 @@ class TestTaskNet{
         D1GPi_conn = new Connection(striatum_d1_layer, gpi_snr_layer, inhib_spec);
         GpeGpi_conn = new Connection(gpe_layer, gpi_snr_layer, inhib_spec);
         GPiThal_conn = new Connection(gpi_snr_layer, thalamus_layer, thal_inhib_spec);
+        StnGpi_conn = new Connection(stn_layer, gpi_snr_layer, ffexcite_rnd_spec);
+        AccStn_conn = new Connection(acc_layer, stn_layer, ffexcite_rnd_spec);
         
         this.setWeights(); // test setting weights which are sums of valid input combinations
         Layer[] layers =  {input_layer, striatum_d1_layer, striatum_d2_layer, gpe_layer,
-                            gpi_snr_layer, thalamus_layer};
+                            gpi_snr_layer, thalamus_layer, stn_layer, acc_layer};
 	    Connection[] conns = {ID1_conn, ID2_conn, D2Gpe_conn,
-                                D1GPi_conn, GPiThal_conn};
+                                D1GPi_conn, GPiThal_conn, StnGpi_conn,
+                                AccStn_conn};
 
         netw = new Network(network_spec, layers, conns);
         netw.build();
@@ -158,8 +196,12 @@ class TestTaskNet{
         //inpvals.set(inputvecsize - 1, 0.0); // set dim of list
         //inpvals.set((int)random(0, inputvecsize), 0.5 * sig.getOutput());
         
-        if(cyc % quart_num == 0){
+        //if(cyc % (quart_num * netw.trial_length) == 0){
+        if(netw.accept_input()){
+            println();
+            //printArray("input", testinputs[inp_ix % testinputs.length]);
             FloatList inpvals = arrayToList(testinputs[inp_ix++ % testinputs.length]);
+            //println("floatlist: " + inpvals.toString());
             inputs.put("Input", inpvals);
             netw.set_inputs(inputs);
         }
@@ -179,12 +221,19 @@ class TestTaskNet{
 
         float[][] inp_viz = zeros(1,inputvecsize);
         inp_viz[0] = input_layer.getOutput();
+        printArray("input layer output", inp_viz[0]);
         
         float[][] d1_viz = zeros(1,inputvecsize);
         d1_viz[0] = striatum_d1_layer.getOutput();
 
         float[][] d2_viz = zeros(1,inputvecsize);
         d2_viz[0] = striatum_d2_layer.getOutput();
+
+        float[][] acc_viz = zeros(1,acc_size);
+        acc_viz[0] = acc_layer.getOutput();
+
+        float[][] stn_viz = zeros(1,stn_size);
+        stn_viz[0] = stn_layer.getOutput();
 
         float[][] gpe_viz = zeros(1,behaviours);
         gpe_viz[0] = gpe_layer.getOutput();
@@ -225,6 +274,24 @@ class TestTaskNet{
             drawColGrid(0,0, 10, multiply(200, d2_viz));
             popMatrix();
             popMatrix();
+            
+            translate(0, 20);
+            pushMatrix();
+            text(acc_layer.name, 0,0);
+            pushMatrix();
+            translate(100, -10);
+            drawColGrid(0,0, 10, multiply(200, acc_viz));
+            popMatrix();
+
+            popMatrix();
+            translate(0, 20);
+            pushMatrix();
+            text(stn_layer.name, 0,0);
+            pushMatrix();
+            translate(100, -10);
+            drawColGrid(0,0, 10, multiply(200, stn_viz));
+            popMatrix();
+            popMatrix();            
 
             translate(0, 20);
             pushMatrix();
@@ -260,16 +327,17 @@ class TestTaskNet{
     void setWeights(){
         // ctx: 010 pos: 10 shp:1000 color:1000 num:1000000000 
         float[][] tstweights_d1 = {
-            {0, 0, 0,  0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0}, // odd, press left
-            {0, 0, 0,  0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0} // even, press right
+            {0, 0, 0,  0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 1, 0, 1, 0, 1, 0, 1, 0,  0}, // odd, press left
+            {0, 0, 0,  0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 1, 0, 1, 0, 1, 0, 1, 0, 1,  0} // even, press right
+            
         };
-        ID1_conn.weights(multiply(0.1, tstweights_d1));
+        ID1_conn.weights(transpose(multiply(0.71, tstweights_d1)));
 
         float[][] tstweights_d2 = {
-            {0, 0, 0,  0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0}, // odd, press left
-            {0, 0, 0,  0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0} // even, press right
+            {0, 0, 0,  0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 1, 0, 1, 0, 1, 0, 1, 0, 1,  0}, // odd, press left
+            {0, 0, 0,  0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 1, 0, 1, 0, 1, 0, 1, 0,  0} // even, press right
         };
-        ID2_conn.weights(multiply(0.1, tstweights_d2));
+        ID2_conn.weights(transpose(multiply(0.71, tstweights_d2)));
     }
 }
 
