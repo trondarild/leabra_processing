@@ -546,3 +546,12 @@ float[] range_expand(float low, float high, float min, float max, float[] a){
   return r;
 }
   
+float[][] transpose(float[][] a){
+  float[][] retval = zeros(a[0].length, a.length);
+  for (int j = 0; j < a.length; ++j) {
+    for (int i = 0; i < a[0].length; ++i) {
+      retval[i][j] = a[j][i];
+    }
+  }
+  return retval;
+}
