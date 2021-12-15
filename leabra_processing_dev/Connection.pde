@@ -302,6 +302,7 @@ class ConnectionSpec{
     }
 
     float xcal(float x, float th){
+        // """ extended contrastive attractor learning """
         if (x < this.d_thr)
             return 0;
         else if (x > th * this.d_rev)
@@ -311,6 +312,10 @@ class ConnectionSpec{
     }
 
     float sig(float w){
+        // """ Sigmoid function to increase contrast """
+        // Note TAT: this may reflect noradrenalin, and 
+        // should be require a noradr input 
+        // (perhaps the sig_gain factor)
         return 1 / 
             (1 + 
                 (this.sig_off * pow(
@@ -322,6 +327,7 @@ class ConnectionSpec{
     }
 
     float sig_inv(float w){
+        // """ Inverse sigmoid """
         if   (w <= 0.0) return 0.0;
         else if (w >= 1.0) return 1.0;
         return 1 / (1 + pow(((1 - w) / w) , (1 / this.sig_gain)) / this.sig_off);
