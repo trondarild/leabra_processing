@@ -167,8 +167,8 @@ class ConnectionSpec{
     float m_lrn    = 1.0;     // weighting of the error driven learning
     float d_thr    = 0.0001;  // threshold value for XCAL check-mark function
     float d_rev    = 0.1;     // reversal value for XCAL check-mark function
-    float sig_off  = 1.0;
-    float sig_gain = 6.0;
+    float sig_off  = 1.0;     // sigmoid offset
+    float sig_gain = 6.0;     // sigmoid gain (noradrenalin?)  
 
     // netin scaling
     float wt_scale_abs = 1.0;  // absolute scaling weight: direct multiplier, strength of the connection
