@@ -35,7 +35,7 @@ Nb: May need temporal context here so not mix up choosing stack and doing task
 1. ctx: 010 pos: 10 shp:1000 color:1000 num:0000000001 out: 0100
 
 **Less than 5?**
-1. ctx: 010 pos: 10 shp:1000 color:0010 num:1000000000 out: 0100 // do num task: even num?
+1. ctx: 010 pos: 10 shp:1000 color:0010 num:1000000000 out: 0100 // < 5?
 1. ctx: 010 pos: 10 shp:1000 color:0010 num:0100000000 out: 0100
 1. ctx: 010 pos: 10 shp:1000 color:0010 num:0010000000 out: 0100
 1. ctx: 010 pos: 10 shp:1000 color:0010 num:0001000000 out: 0100

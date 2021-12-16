@@ -24,6 +24,8 @@ class Link{
 
 }
 
+
+
 class Connection{
     String name;
     Layer pre;
@@ -143,6 +145,24 @@ class Connection{
 
     void compute_netin_scaling(){
         this.spec.compute_netin_scaling(this);
+    }
+}
+
+class DendriteConnection extends Connection{
+    Connection post_connection;
+    float[][] dest_weights;
+
+    DendriteConnection(Layer pre_layer, Connection post_connection, ConnectionSpec spec){
+        super(pre_layer, null, spec);
+        this.post_connection = post_connection;
+    }
+
+
+
+    void cycle(){
+        // set weights on connection
+        post_connection.weights(dest_weights);
+
     }
 }
 
