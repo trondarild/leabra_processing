@@ -153,7 +153,25 @@ class DendriteConnection extends Connection{
     float[][] dest_weights;
 
     DendriteConnection(Layer pre_layer, Connection post_connection, ConnectionSpec spec){
-        super(pre_layer, null, spec);
+        //super(pre_layer, null, spec);
+        this.pre   = pre_layer;
+        
+        //this.post  = post_layer;
+
+        name = pre.name + " -> " + post.name;
+        
+        this.spec  = spec;
+        if (this.spec == null)
+            this.spec = new ConnectionSpec();
+
+        this.wt_scale_act = 1.0;  // scaling relative to activity.
+        this.wt_scale_rel_eff = 0;  // effective relative scaling weight, once other connections
+                                      // are taken into account (computed by the network).
+
+        this.spec.projection_init(this);
+
+        pre_layer.from_connections.add(this);
+        //post_layer.to_connections.add(this);
         this.post_connection = post_connection;
     }
 
