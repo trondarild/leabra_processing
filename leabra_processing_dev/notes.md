@@ -1,4 +1,7 @@
 # Notes
+* 2021-12-19
+   * if model D2 mech. it could be due to pfc pushing up SNc activity transiently to activate D2 receptors on inh neurons/other neurons that sustain activity; this pfc activity should then be effortful (and perhaps require glut. excitation via ACC)
+   * also need pathway that can detect the -change- from current ctx to new ctx, and thus initiate and sustain the necessary activity to reduce difference/error
 * 2021-12-13 
    * TODO add STN population: full projection to GPi and to GPe; random weights from dACC when added; random weights to GPe and GPi?
    * what should the behaviour of the GPe be? If D2 pathway inhibits everything that is -not- the chosen behaviour, then GPe should maybe have an inhibt output to STN for the chosen behaviour, which makes STN excite inhibition for all except chosen in GPi
