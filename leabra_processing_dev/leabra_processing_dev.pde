@@ -8,8 +8,10 @@ import java.util.Map;
 
 // TestHiddenLayer test = new TestHiddenLayer();
 //TestInhibition test = new TestInhibition();
-TestTaskNet test = new TestTaskNet();
+//TestTaskNet test = new TestTaskNet();
 //TestForceActivity test = new TestForceActivity();
+//TestDendriteConnection test = new TestDendriteConnection();
+TestAutoActivity test = new TestAutoActivity();
 
 void setup(){
 	size(600, 1000);
@@ -26,4 +28,15 @@ void draw(){
 	background(51);
 	
 	test.draw();
+}
+
+void keyPressed() {
+  if (key == ' ') {
+    test.setInput(1.0);
+  } 
+}
+
+void keyReleased() {
+  if(key== ' ')
+    test.setInput(0.0);
 }
