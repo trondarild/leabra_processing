@@ -1,4 +1,14 @@
 # Notes
+* 2021-12-29
+   * alternative to using unit-dendrite connection to change current rule (if no evidence for this, get problem)
+      * context prediction error in pfc drives triggering of context change by means of BG initiated inhibition of current rule and excitation of new rule (Wascom, Frank 2017); dACC and ant. insula excites inh, excitation (or excitement of VTA to induce dopa to BG go, pfc effector pops)
+      * when new rule established, this also changes the population representing contex, thus inh the prediction error
+* 2021-12-28
+   * to use unit-dendrite connection, have to implement:
+      * DendriteLink extends Link
+      * UnitLink extends Link
+      * DendriteConnectionSpec extends ConnectionSpec
+      * UnitConnectionSpec extends ConnectionSpec
 * 2021-12-19
    * if model D2 mech. it could be due to pfc pushing up SNc activity transiently to activate D2 receptors on inh neurons/other neurons that sustain activity; this pfc activity should then be effortful (and perhaps require glut. excitation via ACC)
    * also need pathway that can detect the -change- from current ctx to new ctx, and thus initiate and sustain the necessary activity to reduce difference/error
