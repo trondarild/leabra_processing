@@ -4,6 +4,7 @@ import java.util.Map;
 class NetworkSpec{
     // """Network parameters"""
     int quarter_size = 25;
+    boolean do_reset = true;
     NetworkSpec(){}
     
     NetworkSpec(int quarter_size){
@@ -136,7 +137,8 @@ class Network{
 
             if (this.quarter_nb == 1){ // start of trial, // TAT: set inputs only on first quarter
                 // reset all layers
-                if (this.quarter_nb == 1) // TAT: could this "if" be removed?
+                // if (this.quarter_nb == 1) // TAT: could this "if" be removed?
+                if (this.spec.do_reset) // TAT: may not want to reset
                     for (Layer layer : this.layers)
                         layer.trial_init(); // will reset units in layer
                 // force activities for inputs
