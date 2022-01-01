@@ -77,7 +77,7 @@ class TestCtxPredError {
         onetoone_inh_spec.proj = "1to1";
         onetoone_inh_spec.inhib = true;
         onetoone_inh_spec.rnd_type = "uniform";
-        onetoone_inh_spec.rnd_mean = 0.1;
+        onetoone_inh_spec.rnd_mean = 0.5;
         onetoone_inh_spec.rnd_var = 0.01;
 
         // layers
@@ -92,8 +92,12 @@ class TestCtxPredError {
         dACCC_conn = new Connection(dACC_layer, context_layer, onetoone_excite_spec);
         CPE_conn = new Connection(context_layer, predictionerror_layer, onetoone_inh_spec);
 
+        // network
+        network_spec.do_reset = false; // since dont use learning, avoid resetting every quarter
+
         Layer[] layers = {input_layer, context_layer, dACC_layer, predictionerror_layer };
         Connection[] conns = {IC_conn, IPE_conn, PEdACC_conn, dACCC_conn, CPE_conn };
+
 
         netw = new Network(network_spec, layers, conns);
         netw.build();
