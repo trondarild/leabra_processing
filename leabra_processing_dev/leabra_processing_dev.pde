@@ -11,7 +11,8 @@ import java.util.Map;
 //TestTaskNet test = new TestTaskNet();
 //TestForceActivity test = new TestForceActivity();
 //TestDendriteConnection test = new TestDendriteConnection();
-TestAutoActivity test = new TestAutoActivity();
+//TestAutoActivity test = new TestAutoActivity();
+TestCtxPredError test = new TestCtxPredError();
 
 void setup(){
 	size(600, 1000);
@@ -31,12 +32,14 @@ void draw(){
 }
 
 void keyPressed() {
-  if (key == ' ') {
-    test.setInput(1.0);
-  } 
+  // if (key == ' ') {
+  //   test.setInput(1.0);
+  // }
+  test.handleKeyDown(key); 
 }
 
 void keyReleased() {
-  if(key== ' ')
-    test.setInput(0.0);
+  // if(key== ' ')
+  //   test.setInput(0.0);
+  test.handleKeyUp(key);
 }
