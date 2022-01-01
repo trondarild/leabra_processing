@@ -13,6 +13,7 @@ import java.util.Map;
 static int INPUT  = 0;
 static int HIDDEN = 1;
 static int OUTPUT = 2;
+static int TARGET = 2; // same as output and used for error training
 
 class Unit{
     String name;
@@ -131,14 +132,17 @@ class Unit{
 
     void cycle(String phase, float g_i, float dt_integ){
         // """Cycle the unit"""
-        // phase = "minus", "plus"
+        // phase = "minus", "plus" -> predict, sample
         // g_i - inhibition input 0..1
         // dt_integ - time delta (?)
         // return self.spec.cycle(self, phase, g_i=g_i, dt_integ=dt_integ)
         // 2021-12-05 change to use dopa, adeno
         
         // this.spec.cycle_da(this, phase, g_i, dt_integ);
-        this.spec.cycle(this, phase, g_i, dt_integ);
+        if(this.spec.use_dopa)
+            this.spec.cycle_da(this, phase, g_i, dt_integ);
+        else
+            this.spec.cycle(this, phase, g_i, dt_integ);
         buffer.append(act_eq());
     }
 
@@ -311,7 +315,8 @@ class UnitSpec{
     float avg_m_in_s = 0.1;
     float avg_lrn_min = 0.0001; // minimum avg_l_lrn value.
     float avg_lrn_max = 0.5;    // maximum avg_l_lrn value
-    
+    // dopa adeno
+    boolean use_dopa = false;
 
     float[][] nxx1_conv;
     
