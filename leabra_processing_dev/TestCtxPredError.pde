@@ -25,7 +25,7 @@ class TestCtxPredError {
     Connection PEdACC_conn; // support to hidden, CtxPredError
     Connection dACCC_conn; // dACC to context
     Connection CPE_conn; // context to prediction error
-    
+    Connection CC_conn; // context self-sustaining
     int quart_num = 25;
     NetworkSpec network_spec = new NetworkSpec(quart_num);
     Network netw; // network model to contain layers and connections
@@ -54,9 +54,9 @@ class TestCtxPredError {
         excite_auto_unit_spec.g_bar_e=1.0;
         excite_auto_unit_spec.g_bar_l=0.1;
         excite_auto_unit_spec.g_bar_i=0.40;
-        excite_auto_unit_spec.bias = 0.0; // 0.0075;
-        excite_auto_unit_spec.g_l = 1.0;
-        excite_auto_unit_spec.e_rev_l = 0.25;
+        excite_auto_unit_spec.bias = 0.05; // 0.0075; // bias incr from 0
+        excite_auto_unit_spec.g_l = 0.9; // leak reduced from 1.0
+        excite_auto_unit_spec.e_rev_l = 0.3;
 
         // connection spec
         ffexcite_spec.proj="full";
@@ -67,36 +67,36 @@ class TestCtxPredError {
         onetoone_excite_spec.proj = "1to1";
         onetoone_excite_spec.rnd_type = "uniform";
         onetoone_excite_spec.rnd_mean = 0.5;
-        onetoone_excite_spec.rnd_var = 0.01;
+        onetoone_excite_spec.rnd_var = 0.0;
 
         onetoone_excite_weak_spec.proj = "1to1";
         onetoone_excite_weak_spec.rnd_type = "uniform";
         onetoone_excite_weak_spec.rnd_mean = 0.1;
-        onetoone_excite_weak_spec.rnd_var = 0.01;
+        onetoone_excite_weak_spec.rnd_var = 0.0;
 
         onetoone_inh_spec.proj = "1to1";
         onetoone_inh_spec.inhib = true;
         onetoone_inh_spec.rnd_type = "uniform";
         onetoone_inh_spec.rnd_mean = 0.5;
-        onetoone_inh_spec.rnd_var = 0.01;
+        onetoone_inh_spec.rnd_var = 0.0;
 
         // layers
         input_layer = new Layer(inputvecsize, new LayerSpec(false), excite_unit_spec, INPUT, "Input");
         context_layer = new Layer(hiddensize, new LayerSpec(true), excite_auto_unit_spec, HIDDEN, "Context");
-        dACC_layer = new Layer(hiddensize, new LayerSpec(false), excite_auto_unit_spec, HIDDEN, "dACC");
+        dACC_layer = new Layer(hiddensize, new LayerSpec(false), excite_unit_spec, HIDDEN, "dACC");
         predictionerror_layer = new Layer(hiddensize, new LayerSpec(false), excite_unit_spec, HIDDEN, "Pred error");
         // connections
         IC_conn = new Connection(input_layer, context_layer, onetoone_excite_weak_spec);
         IPE_conn = new Connection(input_layer, predictionerror_layer, onetoone_excite_spec);
-        PEdACC_conn = new Connection(predictionerror_layer, dACC_layer, onetoone_excite_spec);
+        PEdACC_conn = new Connection(predictionerror_layer, dACC_layer, onetoone_excite_weak_spec);
         dACCC_conn = new Connection(dACC_layer, context_layer, onetoone_excite_spec);
         CPE_conn = new Connection(context_layer, predictionerror_layer, onetoone_inh_spec);
-
+        CC_conn = new Connection(context_layer, context_layer, onetoone_excite_spec);
         // network
         network_spec.do_reset = false; // since dont use learning, avoid resetting every quarter
 
         Layer[] layers = {input_layer, context_layer, dACC_layer, predictionerror_layer };
-        Connection[] conns = {IC_conn, IPE_conn, PEdACC_conn, dACCC_conn, CPE_conn };
+        Connection[] conns = {/*IC_conn,*/ IPE_conn, PEdACC_conn, dACCC_conn, CPE_conn };
 
 
         netw = new Network(network_spec, layers, conns);
