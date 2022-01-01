@@ -1,4 +1,9 @@
 # Notes
+* 2022-01-01
+   * concept of bias modulation via dendrite APs is also a potential mechanism for context selection
+* 2021-12-30
+   * to test: make a unitspec that can modulate bias and or leakage based on input activity. This can model differential activation of populations by means of alpha, beta bursts. If possible, change weights on recurrent connections, and perhaps combine with very low leakage to model self-sustaining behaviour
+   * check literature for what is plausible mechanisms: leakage, bias modulation 
 * 2021-12-29
    * alternative to using unit-dendrite connection to change current rule (if no evidence for this, get problem)
       * context prediction error in pfc drives triggering of context change by means of BG initiated inhibition of current rule and excitation of new rule (Wascom, Frank 2017); dACC and ant. insula excites inh, excitation (or excitement of VTA to induce dopa to BG go, pfc effector pops)
