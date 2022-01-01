@@ -35,6 +35,10 @@ class Connection{
     float wt_scale_rel_eff;
     ConnectionSpec spec;
 
+    Connection(){
+        this.spec = new ConnectionSpec();
+    }
+    
     Connection( Layer pre_layer, Layer post_layer, ConnectionSpec spec){
         /* """
         Parameters:
@@ -158,18 +162,17 @@ class DendriteConnection extends Connection{
         
         //this.post  = post_layer;
 
-        name = pre.name + " -> " + post.name;
+        name = pre.name + " -> " + post_connection.name;
         
         this.spec  = spec;
         if (this.spec == null)
             this.spec = new ConnectionSpec();
-
+        
         this.wt_scale_act = 1.0;  // scaling relative to activity.
         this.wt_scale_rel_eff = 0;  // effective relative scaling weight, once other connections
                                       // are taken into account (computed by the network).
-
         this.spec.projection_init(this);
-
+        
         pre_layer.from_connections.add(this);
         //post_layer.to_connections.add(this);
         this.post_connection = post_connection;
@@ -243,6 +246,8 @@ class ConnectionSpec{
     }
 
     void full_projection(Connection connection){
+        // TODO adapt to dendrite connection
+
         // creating unit-to-unit links
         connection.links.clear();
         //for i, pre_u in enumerate(connection.pre.units):
@@ -260,6 +265,7 @@ class ConnectionSpec{
     }
 
     void onetoone_connection(Connection connection){        
+        // TODO adapt to dendrite connection
         // creating unit-to-unit links
         connection.links.clear();
         assert (connection.pre.units.length == connection.post.units.length);
