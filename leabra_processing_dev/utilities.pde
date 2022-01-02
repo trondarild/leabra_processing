@@ -375,12 +375,12 @@ void drawSpikeStrip(Buffer[] aspikes, float threshold){
   float x_i =4; float y_i=10;  
   float margin = 1;
   fill(ptcolor);
-  noStroke(); //<>// //<>//
+  noStroke();  
   for(int j=0; j<aspikes.length; j++){
     x=0;
     text("U"+(j+1), x-25, y+5);
     for(int i=0; i<aspikes[0].array().length; i++){
-      // draw the strip //<>// //<>//
+      // draw the strip  
     if(aspikes[j].array()[i] > threshold){
       rect(x, y, x_i, y_i);}
     x+= x_i + margin;
@@ -403,15 +403,15 @@ float[][] makeTopology(int dim, int type){
  // 1 nearest neighbor
  // 2 random
  /*
-  [M, N] = size(T); //<>// //<>// //<>// //<>// //<>// //<>// //<>//
+  [M, N] = size(T);       
   [X, Y] = meshgrid(max(1,m-5):min(M,m+5), max(1,n-5):min(N,n+5));
   I = sub2ind(size(T), X(:), Y(:));
- */ //<>// //<>//
+ */  
  //switch (type){
-   if (type==1){ // nearest neighbor //<>// //<>// //<>//
+   if (type==1){ // nearest neighbor   
      // make a source matrix filled with indeces and a border equal to 
      // kernel size
-     int[][] kernel ={{-1,-1}, {-1, 0}, {-1, 1}, //<>// //<>//
+     int[][] kernel ={{-1,-1}, {-1, 0}, {-1, 1},  
                        {0,-1}, {0, 1},
                      {1,-1}, {1,0}, {1,1}};
      int border = 1; 
@@ -434,12 +434,12 @@ float[][] makeTopology(int dim, int type){
      }
        
      
-   } //<>// //<>// //<>// //<>// //<>// //<>// //<>//
+   }       
    else
    {// TODO implement random
    }
  
- return retval; //<>// //<>// //<>//
+ return retval;   
 }
 
 
@@ -744,4 +744,48 @@ float hysteresis(float in, float prev, float lo_thr, float hi_thr){
 
 int len(float[] a){
   return a.length;
+}
+
+float[] generateRndOneHotVec(int size, int hots) {
+  float[] retval = zeros(size);
+  
+  for (int i=0; i<hots; i++){
+    int ix = 0;
+    do {
+      ix = (int)random(0, size);
+    } while (retval[ix] == 1.f); // fixme: termination issue
+    retval[ix] = 1.0;
+  }
+  
+  return retval;
+}
+
+boolean equal(float[] a, float[] b){
+  if (a.length != b.length) return false;
+  
+  for(int i=0; i<a.length; i++)
+    if(a[i] != b[i])
+      return false;
+  return true;
+}
+
+float[][] generateUniquePatterns(int rows, int cols, int hots){
+  float[][] retval = zeros(rows, cols);
+  for(int j=0; j<rows; j++){
+    float[] vec;
+    do {
+      vec = generateRndOneHotVec(cols, hots);
+    } while (isInMatrix(vec, retval));
+    retval[j] = vec;
+  }
+  
+  return retval;
+}
+
+boolean isInMatrix(float[] vec, float[][] matrix){
+  if(vec.length != matrix[0].length) return false;
+  
+  for(int i=0; i<matrix[0].length; i++)
+    if(equal(vec, matrix[i])) return true;
+  return false;
 }
