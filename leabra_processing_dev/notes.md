@@ -1,6 +1,15 @@
 # Notes
+* 2022-01-02
+   * Can isolate larger parts of network like BG by implementing an interface with following methods:
+      * getinputlayer -> Layer
+      * getoutputlayer -> Layer
+      * getLayers -> Layer[]
+      * getConnections -> Connection[]
 * 2022-01-01
-   * concept of bias modulation via dendrite APs is also a potential mechanism for context selection
+   * TODO: mechanism that adapts weights of D1 D2 pathways based on cost, gains (in example tasks, mostly costs are involved, but Wisconsin task uses reward to change rule/a cost to inhibit a rule)
+   * perhaps also add weights for dopa, adeno?
+   * TODO: add support for dopa, adeno leaky integrators; perhaps impl connection from leaky integrator to layer, and that network stores list of leaky integrators that are cycled?
+   * concept of bias modulation via dendrite APs is also a potential mechanism for context selection and sensitive to alpha, beta frequencies (slow alpha inhibits, faster beta excites)
 * 2021-12-30
    * to test: make a unitspec that can modulate bias and or leakage based on input activity. This can model differential activation of populations by means of alpha, beta bursts. If possible, change weights on recurrent connections, and perhaps combine with very low leakage to model self-sustaining behaviour
    * check literature for what is plausible mechanisms: leakage, bias modulation 
