@@ -116,6 +116,11 @@ class Network{
         this.outputs = act_map;
     }
 
+    void set_targets(Map<String, FloatList> act_map){
+        /** syntactic sugar - calls set_output */
+        set_outputs(act_map);
+    }
+
     void pre_cycle(){
         /* """Check if some action needs to be done before starting the cycle.
 

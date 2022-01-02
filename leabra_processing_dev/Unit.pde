@@ -521,7 +521,7 @@ class UnitSpec{
         // unit.v_m     = max(self.v_m_min, min(unit.v_m, self.v_m_max))
 
         // modulate act_thr
-        // 2021-12-05 TAT: modulate act_thr
+        // 2021-12-05 TAT: modulate threshold: act_thr
         unit.act_thr = this.logistic(this.c_act_thr - unit.r_d1 + unit.r_a1 + unit.r_d2 - unit.r_a2);
         
 
