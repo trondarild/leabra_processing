@@ -333,7 +333,8 @@ class ConnectionSpec{
 
     void learning_rule(Connection connection){
         // """Leabra learning rule."""
-        int i=0;
+        
+        
         for (Link link : connection.links){
             float srs = link.post.avg_s_eff * link.pre.avg_s_eff;
             float srm = link.post.avg_m * link.pre.avg_m;
@@ -341,7 +342,7 @@ class ConnectionSpec{
             // print('{}:{} hebb {}\n  avg_l_lrn={}\n  xcal={}\n  srs={}\n  avg_l={}'.format(connection.post.name, i, link.post.avg_l_lrn * this.xcal(srs, link.post.avg_l), link.post.avg_l_lrn, this.xcal(srs, link.post.avg_l), srs, link.post.avg_l))
             link.dwt += (  this.lrate * ( this.m_lrn * this.xcal(srs, srm)
                          + link.post.avg_l_lrn() * this.xcal(srs, link.post.avg_l)));
-            i++;
+            
         }
     }
 
@@ -351,7 +352,7 @@ class ConnectionSpec{
             return 0;
         else if (x > th * this.d_rev)
             return (x - th);
-        else
+        else 
             return (-x * ((1 - this.d_rev)/this.d_rev));
     }
 
