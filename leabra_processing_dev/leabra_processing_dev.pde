@@ -12,11 +12,13 @@ import java.util.Map;
 //TestForceActivity test = new TestForceActivity();
 //TestDendriteConnection test = new TestDendriteConnection();
 //TestAutoActivity test = new TestAutoActivity();
-TestCtxPredError test = new TestCtxPredError();
+//TestCtxPredError test = new TestCtxPredError();
+TestRandomAssociator test = new TestRandomAssociator();
 
 void setup(){
 	size(600, 1000);
 	// unit.show_config();
+  frameRate(60);
 
 }
 
