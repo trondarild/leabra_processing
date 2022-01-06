@@ -95,8 +95,8 @@ class Connection{
             //     for j, post_u in enumerate(this.post.units):
             //         W[i, j] = next(link_it).wt
             int l = 0;
-            for (int j = 0; j < pre.units.length; ++j) {
-                for (int i = 0; i < post.units.length; ++i) {
+            for (int j = 0; j < pre.units.length; ++j) { // sources
+                for (int i = 0; i < post.units.length; ++i) { // targets
                     W[j][i] = links.get(l++).wt;;
                 }
                 
@@ -128,8 +128,8 @@ class Connection{
             //         link.wt = value[i][j]
             //         link.fwt = this.spec.sig_inv(value[i][j])
             int l = 0;
-            for (int j = 0; j < pre.units.length; ++j) { // targets
-                for (int i = 0; i < post.units.length; ++i) { // sources
+            for (int j = 0; j < pre.units.length; ++j) { // sources
+                for (int i = 0; i < post.units.length; ++i) { // targets
                     links.get(l).wt  = value[j][i];
                     links.get(l).fwt = this.spec.sig_inv(value[j][i]);
                     l++;

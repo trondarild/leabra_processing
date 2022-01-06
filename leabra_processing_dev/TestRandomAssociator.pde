@@ -2,14 +2,14 @@ class TestRandomAssociator {
     String modelname = "Random associator";
     
     int numpatterns = 24;
-    int patternsize = 15;
+    int patternsize = 10;
     int hots = 4;
     int ctr = 0;
     float[][] sourcepatterns;
     float[][] targetpatterns;
     int inputvecsize = patternsize;
     int outputvecsize = patternsize;
-    int hiddensize = 3 * patternsize; //patternsize*patternsize;
+    int hiddensize = 2 * patternsize; //patternsize*patternsize;
 
     // units
     UnitSpec excite_unit_spec = new UnitSpec();
@@ -18,6 +18,7 @@ class TestRandomAssociator {
     LayerSpec output_spec = new LayerSpec();
     Layer input_layer;
     Layer hidden_layer;
+    Layer inh_hidden_layer;
     Layer output_layer;
 
     // connections
@@ -28,6 +29,8 @@ class TestRandomAssociator {
     Connection hidden_output_conn;
     Connection hidden_hidden_conn;
     Connection output_hidden_conn;
+    Connection input_inhhidden_conn;
+    Connection inhhidden_output_conn;
 
     // network
     int quart_num = 25;
@@ -64,15 +67,15 @@ class TestRandomAssociator {
         ffexcite_spec_learn.proj="full";
         ffexcite_spec_learn.rnd_type="uniform" ;
         ffexcite_spec_learn.rnd_mean=0.5;
-        ffexcite_spec_learn.rnd_var=0.40;
+        ffexcite_spec_learn.rnd_var=0.20;
         ffexcite_spec_learn.lrate = 0.04;
         ffexcite_spec_learn.lrule = "leabra";
 
         inh_spec.proj="full";
         inh_spec.rnd_type="uniform" ;
         inh_spec.inhibit = true;
-        inh_spec.rnd_mean=0.3;
-        inh_spec.rnd_var=0.40;
+        inh_spec.rnd_mean=0.5;
+        inh_spec.rnd_var=0.20;
         inh_spec.lrule = "leabra";
         inh_spec.lrate = 0.04;
 
@@ -87,6 +90,7 @@ class TestRandomAssociator {
 
         input_layer = new Layer(inputvecsize, new LayerSpec(false), excite_unit_spec, INPUT, "Input");
         hidden_layer = new Layer(hiddensize, new LayerSpec(true), excite_unit_spec, HIDDEN, "Hidden");
+        inh_hidden_layer = new Layer(hiddensize, new LayerSpec(true), excite_unit_spec, HIDDEN, "Hidden");
         output_layer = new Layer(outputvecsize, output_spec, excite_unit_spec, OUTPUT, "Output");
 
         // connections
@@ -94,12 +98,16 @@ class TestRandomAssociator {
         hidden_output_conn = new Connection(hidden_layer, output_layer, ffexcite_spec_learn);
         hidden_hidden_conn = new Connection(hidden_layer, hidden_layer, inh_spec);
         output_hidden_conn = new Connection(output_layer, hidden_layer, inh_spec);
+        input_inhhidden_conn = new Connection(input_layer, inh_hidden_layer, ffexcite_spec_learn);
+        inhhidden_output_conn = new Connection(inh_hidden_layer, output_layer, inh_spec);
 
         // network
         
-        Layer[] layers = {input_layer, hidden_layer, output_layer};
+        Layer[] layers = {input_layer, hidden_layer, inh_hidden_layer, 
+            output_layer};
         Connection[] conns = {input_hidden_conn, hidden_output_conn, 
-            output_hidden_conn, hidden_hidden_conn};
+            /* output_hidden_conn, hidden_hidden_conn, */ input_inhhidden_conn, 
+            inhhidden_output_conn};
 
 
         netw = new Network(network_spec, layers, conns);
@@ -149,6 +157,9 @@ class TestRandomAssociator {
         float[][] h_viz = zeros(1, hiddensize);
         h_viz[0] = hidden_layer.getOutput();
 
+        float[][] ih_viz = zeros(1, hiddensize);
+        ih_viz[0] = inh_hidden_layer.getOutput();
+
         float[][] out_viz = zeros(1,inputvecsize);
         out_viz[0] = output_layer.getOutput();
 
@@ -178,6 +189,15 @@ class TestRandomAssociator {
 
             translate(0, 20);
             pushMatrix();
+            text(inh_hidden_layer.name, 0,0);
+            pushMatrix();
+            translate(100, -10);
+            drawColGrid(0,0, 10, multiply(200, ih_viz));
+            popMatrix();
+            popMatrix();
+
+            translate(0, 20);
+            pushMatrix();
             text(output_layer.name, 0,0);
             pushMatrix();
             translate(100, -10);
@@ -185,14 +205,14 @@ class TestRandomAssociator {
             popMatrix();
             popMatrix();
 
-            translate(0, 20);
-            pushMatrix();
-            text("Weights", 0,0);
-            pushMatrix();
-            translate(100, -10);
-            drawColGrid(0,0, 10, multiply(200, w_viz));
-            popMatrix();
-            popMatrix();
+            // translate(0, 20);
+            // pushMatrix();
+            // text("Weights", 0,0);
+            // pushMatrix();
+            // translate(100, -10);
+            // drawColGrid(0,0, 10, multiply(200, w_viz));
+            // popMatrix();
+            // popMatrix();
 
             translate(0, 20);
             pushMatrix();

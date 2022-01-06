@@ -13,7 +13,8 @@ import java.util.Map;
 //TestDendriteConnection test = new TestDendriteConnection();
 //TestAutoActivity test = new TestAutoActivity();
 //TestCtxPredError test = new TestCtxPredError();
-TestRandomAssociator test = new TestRandomAssociator();
+//TestRandomAssociator test = new TestRandomAssociator();
+TestCtxRuleInh test = new TestCtxRuleInh();
 
 void setup(){
 	size(600, 1000);

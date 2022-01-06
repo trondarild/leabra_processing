@@ -789,3 +789,29 @@ boolean isInMatrix(float[] vec, float[][] matrix){
     if(equal(vec, matrix[i])) return true;
   return false;
 }
+
+float[][] repeatRows(int rows, float[][] a){
+  float[][] retval = zeros(a.length*rows, a[0].length);
+
+  for (int j = 0; j < a.length; ++j) {
+    for (int i = 0; i < rows; ++i) {
+      retval[rows*j + i] = a[j];
+    }
+  }
+
+  return retval;  
+}
+
+float[][] repeatCols(int cols, float[][] a){
+  float[][] retval = zeros(a.length, a[0].length * cols);
+  for (int j = 0; j < a.length; ++j) {
+    int start = 0;
+    for (int i = 0; i < a[0].length; ++i) {
+      for (int c = 0; c < cols; ++c) {
+        retval[j][start+c] = a[j][i];
+      }
+      start += cols;
+    }
+  }
+  return retval;  
+}

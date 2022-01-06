@@ -56,6 +56,15 @@ float[] mult_per_elm(float[] a, float[] b){
   return retval;
 }
 
+float[][] mult_per_elm(float[][] a, float[][] b){
+  assert(a.length == b.length && a[0].length == b[0].length);
+  float[][] retval = zeros(a.length, a[0].length);
+  for (int j = 0; j < a.length; ++j) {
+    retval[j] = mult_per_elm(a[j], b[j]);
+  }
+  return retval;
+}
+
 float[][] addMatrix(float val, float[][] mat){
   float [][] ret = zeros(mat.length, mat[0].length);
   for (int j=0; j<ret.length; j++)
