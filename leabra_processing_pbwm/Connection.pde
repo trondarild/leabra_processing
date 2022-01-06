@@ -210,7 +210,7 @@ class ConnectionSpec{
     void onetoone_connection(Connection connection){        
         // creating unit-to-unit links
         connection.links.clear();
-        assert (connection.pre.units.length == connection.post.units.length);
+        assert (connection.pre.units.length == connection.post.units.length) : "pre length: " + connection.pre.units.length + "; post length: " + connection.post.units.length;
         // for i, (pre_u, post_u) in enumerate(zip(connection.pre.units, connection.post.units)):
         for (int i = 0; i < connection.pre.units.length; ++i) {
             Unit pre_u = connection.pre.units[i];
