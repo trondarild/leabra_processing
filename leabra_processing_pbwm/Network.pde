@@ -131,8 +131,10 @@ class Network{
         }
 
         if (this.cycle_count == 0){ // start of a quarter
-            for (Connection connection : this.connections)
-               connection.compute_netin_scaling();
+            for (Connection connection : this.connections){
+              assert(connection != null); 
+              connection.compute_netin_scaling();
+            }
 
             if (this.quarter_nb == 1){ // start of trial
                 // reset all layers
