@@ -75,7 +75,7 @@ class TestCtxPredError {
         onetoone_excite_weak_spec.rnd_var = 0.0;
 
         onetoone_inh_spec.proj = "1to1";
-        onetoone_inh_spec.inhib = true;
+        onetoone_inh_spec.inhibit = true;
         onetoone_inh_spec.rnd_type = "uniform";
         onetoone_inh_spec.rnd_mean = 0.5;
         onetoone_inh_spec.rnd_var = 0.0;

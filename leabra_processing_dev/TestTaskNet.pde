@@ -151,13 +151,13 @@ class TestTaskNet{
         inhib_spec.rnd_type="uniform" ;	
         inhib_spec.rnd_mean=0.5;	
         inhib_spec.rnd_var=0.f;	
-        inhib_spec.inhib = true;
+        inhib_spec.inhibit = true;
 
         thal_inhib_spec.proj="1to1";	
         thal_inhib_spec.rnd_type="uniform" ;	
         thal_inhib_spec.rnd_mean=0.15;	// less inh prevents thalamus from just going dark
         thal_inhib_spec.rnd_var=0.f;	
-        thal_inhib_spec.inhib = true;
+        thal_inhib_spec.inhibit = true;
 
         // layers
         input_layer = new Layer(inputvecsize, new LayerSpec(false), excite_unit_spec, INPUT, "Input");

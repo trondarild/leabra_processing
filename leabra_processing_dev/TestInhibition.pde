@@ -95,7 +95,7 @@ class TestInhibition{
         inhib_spec.rnd_type="uniform" ;	
         inhib_spec.rnd_mean=0.5;	
         inhib_spec.rnd_var=0.f;	
-        inhib_spec.inhib = true;
+        inhib_spec.inhibit = true;
         
         inhibinhib_spec.proj="full";	
         inhibinhib_spec.rnd_type="uniform" ;	
