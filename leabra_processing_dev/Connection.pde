@@ -190,7 +190,7 @@ class DendriteConnection extends Connection{
 class ConnectionSpec{
     String[] legal_proj = {"full", "1to1"};
 
-    boolean inhib    = false;   // if True, inhibitory connection
+    boolean inhibit    = false;   // if True, inhibitory connection
     String proj     = "full";  // connection pattern between units.
                             // Can be 'Full' or '1to1'. In the latter case,
                             // the layers must have the same size.
@@ -225,7 +225,7 @@ class ConnectionSpec{
         for (Link link : connection.links){
             if (link.post.act_ext ==0){ // activity not forced
                 float scaled_act = this.wt_scale_abs * connection.wt_scale() * link.wt * link.pre.act;
-                if(this.inhib) // TAT 2021-12-10: support for inhibitory projections
+                if(this.inhibit) // TAT 2021-12-10: support for inhibitory projections
                     link.post.add_inhibitory(scaled_act);
                 else
                     link.post.add_excitatory(scaled_act);
@@ -324,11 +324,14 @@ class ConnectionSpec{
             // print('before  wt={}  fwt={}  dwt={}'.format(link.wt, link.fwt, link.dwt))
             link.dwt *= (link.dwt > 0) ? (1 - link.fwt) : link.fwt;
             link.fwt += link.dwt;
+            // print(link.name + " dwt: " + link.dwt + ";");
             link.wt = this.sig(link.fwt);
             // print('after   wt={}  fwt={}  dwt={}'.format(link.wt, link.fwt, link.dwt))
 
             link.dwt = 0.0;
+            
         }
+        // println();
     }
 
     void learning_rule(Connection connection){
