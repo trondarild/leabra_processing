@@ -1,4 +1,6 @@
 # Notes
+* 2022-01-05
+    * #puzzle: see that weights saturate for random associator test, and do not get less than 4.0 in error (ie all hots are wrong). In python impl can get less than 2 in error after 100 steps
 * 2022-01-02
    * Can isolate larger parts of network like BG by implementing an interface with following methods:
       * getinputlayer -> Layer
