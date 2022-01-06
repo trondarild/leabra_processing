@@ -2,26 +2,31 @@ class TestRandomAssociator {
     String modelname = "Random associator";
     
     int numpatterns = 24;
-    int patternsize = 10;
+    int patternsize = 15;
     int hots = 4;
     int ctr = 0;
     float[][] sourcepatterns;
     float[][] targetpatterns;
     int inputvecsize = patternsize;
-    int hiddensize = 20;
+    int outputvecsize = patternsize;
+    int hiddensize = 3 * patternsize; //patternsize*patternsize;
 
     // units
     UnitSpec excite_unit_spec = new UnitSpec();
 
     // layers
+    LayerSpec output_spec = new LayerSpec();
     Layer input_layer;
     Layer hidden_layer;
     Layer output_layer;
 
     // connections
     ConnectionSpec ffexcite_spec  = new ConnectionSpec();
+    ConnectionSpec ffexcite_spec_learn  = new ConnectionSpec();
+    ConnectionSpec inh_spec  = new ConnectionSpec();
     Connection input_hidden_conn;
     Connection hidden_output_conn;
+    Connection hidden_hidden_conn;
     Connection output_hidden_conn;
 
     // network
@@ -35,6 +40,7 @@ class TestRandomAssociator {
 
     float[] inputval = zeros(inputvecsize);
     Buffer sse = new Buffer(100);
+    Buffer trial_sse = new Buffer(numpatterns);
     float current_sse = 0;
     
     TestRandomAssociator() {
@@ -53,36 +59,61 @@ class TestRandomAssociator {
         ffexcite_spec.rnd_type="uniform" ;
         ffexcite_spec.rnd_mean=0.5;
         ffexcite_spec.rnd_var=0.20;
-        ffexcite_spec.lrate = 0.04;
+        
+
+        ffexcite_spec_learn.proj="full";
+        ffexcite_spec_learn.rnd_type="uniform" ;
+        ffexcite_spec_learn.rnd_mean=0.5;
+        ffexcite_spec_learn.rnd_var=0.40;
+        ffexcite_spec_learn.lrate = 0.04;
+        ffexcite_spec_learn.lrule = "leabra";
+
+        inh_spec.proj="full";
+        inh_spec.rnd_type="uniform" ;
+        inh_spec.inhibit = true;
+        inh_spec.rnd_mean=0.3;
+        inh_spec.rnd_var=0.40;
+        inh_spec.lrule = "leabra";
+        inh_spec.lrate = 0.04;
+
 
         // layers
+        output_spec.g_i=1.5;
+        output_spec.ff=1.0;
+        output_spec.fb=0.5;
+        output_spec.fb_dt=1/1.4;
+        output_spec.ff0=0.1;
+        
+
         input_layer = new Layer(inputvecsize, new LayerSpec(false), excite_unit_spec, INPUT, "Input");
-        hidden_layer = new Layer(hiddensize, new LayerSpec(false), excite_unit_spec, HIDDEN, "Hidden");
-        output_layer = new Layer(inputvecsize, new LayerSpec(false), excite_unit_spec, OUTPUT, "Output");
+        hidden_layer = new Layer(hiddensize, new LayerSpec(true), excite_unit_spec, HIDDEN, "Hidden");
+        output_layer = new Layer(outputvecsize, output_spec, excite_unit_spec, OUTPUT, "Output");
 
         // connections
-        input_hidden_conn = new Connection(input_layer, hidden_layer, ffexcite_spec);
-        hidden_output_conn = new Connection(hidden_layer, output_layer, ffexcite_spec);
-        output_hidden_conn = new Connection(output_layer, hidden_layer, ffexcite_spec);
+        input_hidden_conn = new Connection(input_layer, hidden_layer, ffexcite_spec_learn);
+        hidden_output_conn = new Connection(hidden_layer, output_layer, ffexcite_spec_learn);
+        hidden_hidden_conn = new Connection(hidden_layer, hidden_layer, inh_spec);
+        output_hidden_conn = new Connection(output_layer, hidden_layer, inh_spec);
 
         // network
         
         Layer[] layers = {input_layer, hidden_layer, output_layer};
-        Connection[] conns = {input_hidden_conn, hidden_output_conn, output_hidden_conn};
+        Connection[] conns = {input_hidden_conn, hidden_output_conn, 
+            output_hidden_conn, hidden_hidden_conn};
 
 
         netw = new Network(network_spec, layers, conns);
         netw.build();
 
         // create input outputs
-        sourcepatterns = generateUniquePatterns(numpatterns, patternsize, hots);
-        targetpatterns = generateUniquePatterns(numpatterns, patternsize, hots);
+        sourcepatterns = generateUniquePatterns(numpatterns, inputvecsize, hots);
+        targetpatterns = generateUniquePatterns(numpatterns, outputvecsize, hots);
         
     }
 
     void tick() {
         
-        if(true){ // netw.accept_input()){
+        if(netw.accept_input()){
             int ptrn_ix = ctr++ % numpatterns ;
             FloatList inpvals = arrayToList(sourcepatterns[ptrn_ix]);
             inputs.put("Input", inpvals);
@@ -92,11 +123,15 @@ class TestRandomAssociator {
             targets.put("Output", targetvals);
             netw.set_targets(targets);
             current_sse = netw.compute_sse();
-            sse.append(current_sse);
+            trial_sse.append(current_sse);
+            if (ptrn_ix==0){
+                sse.append(mean(trial_sse.array()));
+                // printMatrix("hidden weights", hidden_output_conn.weights());
+            }
         }
         current_sse = netw.trial();
-        sse.append(current_sse);
-        //netw.cycle();
+        // sse.append(current_sse / sourcepatterns.length);
+        // netw.cycle();
     }
 
     void draw() {
