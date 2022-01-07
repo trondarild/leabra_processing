@@ -1,8 +1,9 @@
 # Notes
 * 2022-01-07
+    * TODO what more is needed now to assemble decision demand model?
     * TODO test partial connection 
         1. with default standard - appears ok
-        1. with partial
+        1. with partial - ok
     * #note - merely creating a connection will affect layer activity, even if the connection is not added to the network. This appears to be due to accessing connections in the network.build() method. This appears also to affect order of activation (since no explicit dealy is set on connections)
 * 2022-01-06
    * todo: develop compensatory recruitment of extra units when existing units lose efficacy due to adenosine induced threshold increase
