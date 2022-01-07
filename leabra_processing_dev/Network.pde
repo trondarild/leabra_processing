@@ -72,6 +72,9 @@ class Network{
         This needs to be run every time a layer or connection is added or removed from the network,
         or if the value of a connection's `wt_scale_rel` is changed. This automatically run when
         using the `add_connection()` method.
+
+        #Note TAT 2022-01-07: connections will affect unit activation, even if not explicitly added to 
+                                to network due to processing here 
         """ */
         for (Layer layer : this.layers){
             // rel_sum = sum(connection.spec.wt_scale_rel for connection in layer.to_connections)
@@ -180,7 +183,7 @@ class Network{
     void cycle(){
         // """Execute a cycle"""
         // takes care of minus (prediction) and
-        // plus (sensing) phases
+        // plus (sensing, outcome) phases
         this.pre_cycle();
 
         for (Connection conn : this.connections)
