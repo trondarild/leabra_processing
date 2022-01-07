@@ -232,6 +232,30 @@ class ConnectionSpec{
         // TODO add params, get, set
     }
 
+    ConnectionSpec(ConnectionSpec c) {
+        // copy constructor
+        // 
+        
+        this.inhibit = c.inhibit; 
+        this.proj = c.proj;    
+        this.rnd_type = c.rnd_type;
+        this.rnd_mean = c.rnd_mean;
+        this.rnd_var = c.rnd_var; 
+        this.lrule = c.lrule;   
+        this.lrate = c.lrate;   
+        this.m_lrn = c.m_lrn;   
+        this.d_thr = c.d_thr;   
+        this.d_rev = c.d_rev;   
+        this.sig_off = c.sig_off; 
+        this.sig_gain = c.sig_gain;
+        this.wt_scale_abs = c.wt_scale_abs;
+        this.wt_scale_rel = c.wt_scale_rel;
+        this.pre_startix = c.pre_startix;
+        this.pre_endix = c.pre_endix;
+        this.post_startix = c.post_startix;
+        this.post_endix = c.post_endix;
+    }
+
     void cycle(Connection connection){
         // """Transmit activity."""
         for (Link link : connection.links){
@@ -405,5 +429,7 @@ class ConnectionSpec{
         else if (w >= 1.0) return 1.0;
         return 1 / (1 + pow(((1 - w) / w) , (1 / this.sig_gain)) / this.sig_off);
     }
+
+
 
 }
