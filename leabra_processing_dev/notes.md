@@ -1,4 +1,6 @@
 # Notes
+* 2022-01-07
+    * #note - merely creating a connection will affect layer activity, even if the connection is not added to the network. This appears to be due to accessing connections in the network.build() method. This appears also to affect order of activation (since no explicit dealy is set on connections)
 * 2022-01-06
     * perhaps add optional index limits to connection, so can partially connect two populations: from_ix, to_ix, where default is full connection
 * 2022-01-05
