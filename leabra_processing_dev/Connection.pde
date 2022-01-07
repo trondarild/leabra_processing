@@ -79,6 +79,9 @@ class Connection{
     float[][] weights(){
         // """Return a matrix of the links weights"""
         // TODO add support for general topologies
+        int pre_end = this.spec.pre_endix == -1 ? this.pre.units.length-1 : this.spec.pre_endix - this.spec.pre_startix + 1;
+        int post_end = this.spec.post_endix == -1 ? this.post.units.length-1 : this.spec.post_endix - this.spec.post_startix + 1;
+        
         float[][] W;
         if (this.spec.proj.toLowerCase() == "1to1"){
             //return np.array([[link.wt for link in this.links]])
@@ -95,8 +98,8 @@ class Connection{
             //     for j, post_u in enumerate(this.post.units):
             //         W[i, j] = next(link_it).wt
             int l = 0;
-            for (int j = 0; j < pre.units.length; ++j) { // sources
-                for (int i = 0; i < post.units.length; ++i) { // targets
+            for (int j = 0; j < pre_end; ++j) { // sources
+                for (int i = 0; i < post_end; ++i) { // targets
                     W[j][i] = links.get(l++).wt;;
                 }
                 
@@ -109,6 +112,9 @@ class Connection{
         // """Override the links weights""" 
         // value: source as columns, destination as rows
         // TAT: use this to manually set connections to activate beh.
+        int pre_end = this.spec.pre_endix == -1 ? this.pre.units.length-1 : this.spec.pre_endix - this.spec.pre_startix + 1;
+        int post_end = this.spec.post_endix == -1 ? this.post.units.length-1 : this.spec.post_endix - this.spec.post_startix + 1;
+        
         if (this.spec.proj.toLowerCase() == "1to1"){
             assert (value[0].length == this.links.size());
             //for wt, link in zip(value, this.links):
@@ -128,8 +134,8 @@ class Connection{
             //         link.wt = value[i][j]
             //         link.fwt = this.spec.sig_inv(value[i][j])
             int l = 0;
-            for (int j = 0; j < pre.units.length; ++j) { // sources
-                for (int i = 0; i < post.units.length; ++i) { // targets
+            for (int j = 0; j < pre_end; ++j) { // sources
+                for (int i = 0; i < post_end; ++i) { // targets
                     links.get(l).wt  = value[j][i];
                     links.get(l).fwt = this.spec.sig_inv(value[j][i]);
                     l++;
@@ -215,6 +221,12 @@ class ConnectionSpec{
     float wt_scale_abs = 1.0;  // absolute scaling weight: direct multiplier, strength of the connection
     float wt_scale_rel = 1.0;  // relative scaling weight, relative to other connections.
 
+    // partial 
+    int pre_startix = 0;
+    int pre_endix = -1; // use all
+    int post_startix = 0;
+    int post_endix = -1; // use all;
+
 
     ConnectionSpec(){
         // TODO add params, get, set
@@ -252,8 +264,11 @@ class ConnectionSpec{
         connection.links.clear();
         //for i, pre_u in enumerate(connection.pre.units):
         //    for j, post_u in enumerate(connection.post.units):
-        for (int j = 0; j < connection.pre.units.length; ++j) {
-            for (int i = 0; i < connection.post.units.length; ++i) {
+        int pre_end = this.pre_endix == -1 ? connection.pre.units.length-1 : this.pre_endix;
+        int post_end = this.post_endix == -1 ? connection.post.units.length-1 : this.post_endix;
+        // TODO: add assert here
+        for (int j = pre_startix; j <= pre_end; ++j) {
+            for (int i = post_startix; i <= post_end; ++i) {
                 Unit pre_u = connection.pre.units[j];
                 Unit post_u = connection.post.units[i];
                 float w0 = this.rnd_wt();
@@ -268,14 +283,20 @@ class ConnectionSpec{
         // TODO adapt to dendrite connection
         // creating unit-to-unit links
         connection.links.clear();
-        assert (connection.pre.units.length == connection.post.units.length);
+        // assert (connection.pre.units.length == connection.post.units.length);
+        // TODO: add assert, checking valid start, ends
+        int pre_end = this.pre_endix == -1 ? connection.pre.units.length-1 : this.pre_endix;
+        int post_end = this.post_endix == -1 ? connection.post.units.length-1 : this.post_endix;
+        
+        assert (pre_end-this.pre_startix + 1 == post_end-this.post_startix + 1);
         // for i, (pre_u, post_u) in enumerate(zip(connection.pre.units, connection.post.units)):
-        for (int i = 0; i < connection.pre.units.length; ++i) {
-            Unit pre_u = connection.pre.units[i];
-            Unit post_u = connection.post.units[i];
+        // for (int i = 0; i < connection.pre.units.length; ++i) {
+        for (int i = 0; i <= pre_end-this.pre_startix; ++i) {
+            Unit pre_u = connection.pre.units[pre_startix + i];
+            Unit post_u = connection.post.units[post_startix + i];
             float w0 = this.rnd_wt();
             float fw0 = this.sig_inv(w0);
-            int[] ix = {i, i};
+            int[] ix = {pre_startix+i, post_startix+i};
             connection.links.add(new Link(pre_u, post_u, w0, fw0, ix));
         }
             
@@ -285,9 +306,13 @@ class ConnectionSpec{
         /* """Compute Netin Scaling
 
         See https://grey.colorado.edu/emergent/index.php/Leabra_Netin_Scaling for details.
+        
+        TODO: add support for partial connection
+        
         """ */
         float pre_act_avg = connection.pre.avg_act_p_eff;
-        int pre_size = connection.pre.units.length;
+        // int pre_size = connection.pre.units.length;
+        int pre_size = this.pre_endix==-1 ? connection.pre.units.length : this.pre_endix - this.pre_startix + 1;
         int n_links = connection.links.size();
 
         float sem_extra = 2.0; // constant
