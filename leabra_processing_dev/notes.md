@@ -2,9 +2,10 @@
 * 2022-01-07
     * #note - merely creating a connection will affect layer activity, even if the connection is not added to the network. This appears to be due to accessing connections in the network.build() method. This appears also to affect order of activation (since no explicit dealy is set on connections)
 * 2022-01-06
-    * perhaps add optional index limits to connection, so can partially connect two populations: from_ix, to_ix, where default is full connection
+   * todo: develop compensatory recruitment of extra units when existing units lose efficacy due to adenosine induced threshold increase
+   * perhaps add optional index limits to connection, so can partially connect two populations: from_ix, to_ix, where default is full connection
 * 2022-01-05
-    * #puzzle: see that weights saturate for random associator test, and do not get less than 4.0 in error (ie all hots are wrong). In python impl can get less than 2 in error after 100 steps
+   * #puzzle: see that weights saturate for random associator test, and do not get less than 4.0 in error (ie all hots are wrong). In python impl can get less than 2 in error after 100 steps
 * 2022-01-02
    * Can isolate larger parts of network like BG by implementing an interface with following methods:
       * getinputlayer -> Layer
