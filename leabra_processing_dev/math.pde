@@ -15,6 +15,14 @@ float[][] id(int sz){
   return ret;
 }
 
+float[] ones(int dim){
+  float[] ret = zeros(dim);
+  for (int i = 0; i < ret.length; ++i) {
+    ret[i] = 1.0;
+  }
+  return ret;
+}
+
 float[][] ones(int rows, int cols){
   return ones(rows, cols, 1.f);
 }
@@ -147,6 +155,20 @@ int argmax(float[] a, int start, int stop){
       retval = i;
   }
   return retval;
+}
+
+float limitval(float lower, float upper, float a){
+  float ret = 0;
+  
+    if(a < lower) 
+      ret = lower;
+    else if(a > upper) 
+      ret = upper;
+    else 
+      ret = a;
+  
+  return ret;
+  
 }
 
 float[] limitval(float lower, float upper, float[] a){
