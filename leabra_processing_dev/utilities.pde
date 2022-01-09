@@ -48,6 +48,21 @@ void draw_q_phase_line(float angle, int quant, float trans_x, float trans_y){
   draw_rot_line(rotangle, trans_x, trans_y);
 }
 
+void barchart_array(float[] data, String legend){
+  float yscl = 47.8;
+  float xscl = 134.0;
+  
+  barchart_array(
+    data,
+    0, 0,
+    yscl, xscl,
+    #A0EA9A,
+    1,
+    1.f,
+    legend
+  );
+}
+
 /**
   float yf1, 
   float xf1, 
@@ -82,9 +97,10 @@ void barchart_array(float[] data,
   color clr, 
   int labelplacement,
   float aymax,
-  String legend,
-  PFont h1,
-  PFont l1) {
+  String legend)
+  // PFont h1,
+  // PFont l1) 
+  {
     pushStyle();
   //Declare a float variabe for the max y axis value.
    float ymax=aymax;
@@ -120,7 +136,7 @@ void barchart_array(float[] data,
        float xcount = data.length;
        
        //Draw the minimum and maximum Y Axis labels. 
-       textFont(h1);
+       // textFont(h1);
        fill (100);
        textAlign(RIGHT, CENTER);
        text(int(ymax), xf1-8, yf1-yscale);
@@ -161,7 +177,7 @@ void barchart_array(float[] data,
          quad(xf1, yf1, xf1, yf1-ysclhght, xf1 + xwidth, yf1-ysclhght, xf1 + xwidth, yf1);
          
          //Draw the labels.
-         textFont(l1);
+         // textFont(l1);
          textAlign(CENTER, CENTER);
          fill (100);
          
