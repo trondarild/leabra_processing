@@ -433,3 +433,6 @@ class ConnectionSpec{
 
 
 }
+
+
+// 2022-01-09 TODO: add ReservoirConnection for Connection to, from reservoir and unit

@@ -44,7 +44,7 @@ class TestDopa {
 
         dopa_unit_spec.adapt_on = false;
         dopa_unit_spec.noisy_act=true;
-        dopa_unit_spec.c_act_thr=0.99;
+        dopa_unit_spec.c_act_thr=0.99; // use this instead of act_thr for dopa mod
         dopa_unit_spec.act_gain=100;
         dopa_unit_spec.tau_net=40;
         dopa_unit_spec.g_bar_e=1.0;
