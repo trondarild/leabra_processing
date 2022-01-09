@@ -1,5 +1,6 @@
 # Notes
 * 2022-01-07
+    * TODO check Andre 2019 for hints on how dACC recruits more units
     * TODO what more is needed now to assemble decision demand model?
     * TODO test partial connection 
         1. with default standard - appears ok
