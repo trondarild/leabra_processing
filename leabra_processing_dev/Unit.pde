@@ -186,6 +186,21 @@ class Unit{
         this.spec.update_avg_l(this);
     }
 
+    void set_dopa(float da) { // TAT 2022-01-09
+        // first approx: set dependent on D1 D2 thresholds
+        // TODO add weights on dedicated connection
+        // TODO perhaps probability of dopa based on gaussian?
+        this.r_d1 = da < this.spec.d1_thr ? da : 0.0;
+        this.r_d2 = da >= this.spec.d2_thr ? da : 0.0;
+    }
+
+    void set_adeno(float ado) { // TAT 2022-01-09
+        // first approx: set dependent on A1 A2 thresholds
+        // TODO add weights on dedicated connection
+        this.r_a1 = ado <  this.spec.a1_thr ? ado : 0.0;
+        this.r_a2 = ado >= this.spec.a2_thr ? ado : 0.0;
+    }
+
 
     void reset(){
         // """Reset the Unit state. Called at creation, and at every trial."""
@@ -267,6 +282,12 @@ class UnitSpec{
     >>> spec.bias = 0.5               // you can also do it afterward
     >>> u = Unit(spec=spec)           // creating a Unit instance
 
+    ===TAT===
+    * 2022-01-09: 
+        * Adenosine A1 receptors appear to interact with Dopamine D1 
+        receptors. It has the highest affinity of the adeno receptors 
+        (70nM according to Dunwiddie and Masino 2001)
+
     */
 
     // time step constants
@@ -317,6 +338,10 @@ class UnitSpec{
     float avg_lrn_max = 0.5;    // maximum avg_l_lrn value
     // dopa adeno
     boolean use_dopa = false;
+    float d1_thr = 0.5; // upper limit for D1
+    float d2_thr = 0.5; // lower limit for D2
+    float a1_thr = 0.5; // upper limit for A1
+    float a2_thr = 0.5; // lower limit for A2
 
     float[][] nxx1_conv;
     
@@ -522,8 +547,11 @@ class UnitSpec{
 
         // modulate act_thr
         // 2021-12-05 TAT: modulate threshold: act_thr
-        unit.act_thr = this.logistic(this.c_act_thr - unit.r_d1 + unit.r_a1 + unit.r_d2 - unit.r_a2);
-        
+        // 2022-01-09 TAT: adeno cannot affect threshold alone -> check
+        unit.act_thr = this.logistic(this.c_act_thr
+            - max(0, unit.r_d1 - unit.r_a1)
+            + max(0, unit.r_d2 - unit.r_a2));
+        println(unit.name + " thr: " + unit.act_thr);
 
         // reseting v_m if over the threshold (spike-like behavior)
         if (unit.v_m > unit.act_thr){ // 2021-12-05 TAT may use Dopa and Adeno to modulate act_thr!

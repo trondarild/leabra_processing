@@ -117,6 +117,20 @@ class Layer{
         }
     }
 
+    void set_dopa(float[] da) { // TAT 2022-01-09
+        assert (da.length == units.length) : da.length + " != " + units.length;
+        for (int i = 0; i < units.length; ++i) {
+            units[i].set_dopa(da[i]);
+        }
+    }
+
+    void set_adeno(float[] ado) { // TAT 2022-01-09
+        assert (ado.length == units.length) : ado.length + " != " + units.length;
+        for (int i = 0; i < units.length; ++i) {
+            units[i].set_adeno(ado[i]);
+        }
+    }
+
     void cycle(String phase){
         this.spec.cycle(this, phase);
         for (int i = 0; i < units.length; ++i) {
