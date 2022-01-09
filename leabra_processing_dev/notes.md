@@ -1,4 +1,8 @@
 # Notes
+* 2022-01-09
+    * Adeno receptors can modulate presynaptic axon alone, but interacts with dopa receptors on postsynaptic dendrite (ref in Preedy 2017)
+    * perhaps add support for "Reservoir" that may be connected to, and can connect to layers/units, and that simulates non-synaptic modulatory inputs -> dopa, 5HT, norad, adeno, 
+    * Reservoir may inherit or consists of LeakyIntegrator, but have support for ReservoirSpec in spirit of Leabra framework; network stores reservoirs and cycles them
 * 2022-01-07
     * TODO check Andre 2019 for hints on how dACC recruits more units
     * TODO what more is needed now to assemble decision demand model?
