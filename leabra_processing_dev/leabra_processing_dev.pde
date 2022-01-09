@@ -13,9 +13,11 @@ import java.util.Map;
 //TestDendriteConnection test = new TestDendriteConnection();
 //TestAutoActivity test = new TestAutoActivity();
 //TestCtxPredError test = new TestCtxPredError();
-TestRandomAssociator test = new TestRandomAssociator();
+//TestRandomAssociator test = new TestRandomAssociator();
 //TestCtxRuleInh test = new TestCtxRuleInh();
 //TestEnsnRecruitment test = new TestEnsnRecruitment();
+//TestPartialConnection test = new TestPartialConnection();
+TestDopa test = new TestDopa();
 
 void setup(){
 	size(600, 1000);
