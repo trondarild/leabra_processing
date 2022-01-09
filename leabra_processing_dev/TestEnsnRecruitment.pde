@@ -75,7 +75,7 @@ class TestEnsnRecruitment {
 
         onetoone_excite_weak_spec.proj = "1to1";
         onetoone_excite_weak_spec.rnd_type = "uniform";
-        onetoone_excite_weak_spec.rnd_mean = 0.2;
+        onetoone_excite_weak_spec.rnd_mean = 0.1;
         onetoone_excite_weak_spec.rnd_var = 0.0;
 
         onetoone_inh_spec.proj = "1to1";
