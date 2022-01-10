@@ -6,7 +6,7 @@ import java.util.Map;
 
 
 
-// TestHiddenLayer test = new TestHiddenLayer();
+//TestHiddenLayer test = new TestHiddenLayer();
 //TestInhibition test = new TestInhibition();
 //TestTaskNet test = new TestTaskNet();
 //TestForceActivity test = new TestForceActivity();
@@ -17,7 +17,10 @@ import java.util.Map;
 //TestCtxRuleInh test = new TestCtxRuleInh();
 //TestEnsnRecruitment test = new TestEnsnRecruitment();
 //TestPartialConnection test = new TestPartialConnection();
-TestDopa test = new TestDopa();
+//TestDopa test = new TestDopa();
+//TestIntegrator test = new TestIntegrator();
+//TestReservoir test = new TestReservoir();
+TestDopaReservoir test = new TestDopaReservoir();
 
 void setup(){
 	size(600, 1000);

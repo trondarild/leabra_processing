@@ -82,6 +82,14 @@ class Layer{
         return retval;
     }
 
+    float[] act_thr(){
+        float[] retval = zeros(this.size);
+        for (int i = 0; i < this.size; ++i) {
+            retval[i] = units[i].act_thr;
+        }
+        return retval;
+    }
+
     Buffer[] getBuffers(){
         return buffers;
     }

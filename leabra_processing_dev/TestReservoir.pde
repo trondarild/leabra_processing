@@ -53,7 +53,8 @@ class TestReservoir {
         IH_conn = new Connection(input_layer, hidden_layer, ffexcite_spec);
 
         // reservoir
-        reservoir = new Reservoir(hiddensize, new ReservoirSpec(), new LeakyIntegratorSpec(), DOPAMINE, "Reservoir");
+        //reservoir = new Reservoir(hiddensize, new ReservoirSpec(), new LeakyIntegratorSpec(), DOPAMINE, "Reservoir");
+        reservoir = new Reservoir(hiddensize, DOPAMINE, "Reservoir");
         // network
         network_spec.do_reset = false; // since dont use learning, avoid resetting every quarter
 

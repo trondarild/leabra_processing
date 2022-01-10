@@ -27,9 +27,9 @@ class Unit{
     String[] log_names = {"net", "I_net", "v_m", "act", "v_m_eq", "adapt"};
     float avg_ss;
     float avg_s;
-    float avg_m;
+    float avg_m; // used in learning
     float avg_l;
-    float avg_s_eff;
+    float avg_s_eff; // used in learning
     ArrayList<Float> ex_inputs = new ArrayList<Float>();
     ArrayList<Float> inh_inputs = new ArrayList<Float>(); // TAT 2021-12-10: added inh inputs, different from internal inh
     float g_e;
@@ -284,7 +284,7 @@ class UnitSpec{
 
     ===TAT===
     * 2022-01-09: 
-        * Adenosine A1 receptors appear to interact with Dopamine D1 
+        * Adenosine A1 receptors can interact with Dopamine D1 
         receptors. It has the highest affinity of the adeno receptors 
         (70nM according to Dunwiddie and Masino 2001)
 
@@ -551,7 +551,10 @@ class UnitSpec{
         unit.act_thr = this.logistic(this.c_act_thr
             - max(0, unit.r_d1 - unit.r_a1)
             + max(0, unit.r_d2 - unit.r_a2));
+        println(unit.name + " r_d1: " + unit.r_d1 + "; r_a1: " + unit.r_a1 );
+        println(unit.name + " r_d2: " + unit.r_d2 + "; r_a2: " + unit.r_a2 );
         println(unit.name + " thr: " + unit.act_thr);
+        println();
 
         // reseting v_m if over the threshold (spike-like behavior)
         if (unit.v_m > unit.act_thr){ // 2021-12-05 TAT may use Dopa and Adeno to modulate act_thr!

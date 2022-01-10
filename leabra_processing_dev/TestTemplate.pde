@@ -14,8 +14,6 @@ class TestTemplate {
     
     // connections
     ConnectionSpec ffexcite_spec  = new ConnectionSpec();
-    
-    
     Connection IH_conn; // input to context
     
     int quart_num = 25;

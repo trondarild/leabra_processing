@@ -20,6 +20,22 @@ class Reservoir {
     // ArrayList<Connection> from_connections = new ArrayList<Connection>();
     // ArrayList<Connection> to_connections = new   ArrayList<Connection>();
 
+    Reservoir(int size, int type, String name) {
+        this.name = name;
+        this.size = size;
+        this.type = type;
+        this.spec = new ReservoirSpec();
+        LeakyIntegratorSpec unit_spec = new LeakyIntegratorSpec();
+
+        units = new LeakyIntegrator[size];
+        for (int i = 0; i < units.length; ++i) {
+            units[i] = new LeakyIntegrator(unit_spec, type);
+            units[i].name = this.name + "_" + i;
+        }
+        buffers = new Buffer[size];
+
+    }
+
     Reservoir(int size, ReservoirSpec spec, LeakyIntegratorSpec unit_spec, int type, String name){
         /**
         size - number of leaky integrators
