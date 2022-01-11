@@ -118,7 +118,6 @@ class TestReservoir {
             popMatrix();
 
             translate(0, 20);
-            // float[] da = multiply(dopa, ones(hiddensize));
             pushMatrix();
             translate(10, 50);
             barchart_array(multiply(0.10, reservoir.getOutput()), reservoir.name);
