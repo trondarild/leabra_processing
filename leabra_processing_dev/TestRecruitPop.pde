@@ -17,17 +17,10 @@ class TestRecruitPop {
     
     // connections
     ConnectionSpec ffexcite_spec  = new ConnectionSpec();
-    ConnectionSpec full_spec_0  = new ConnectionSpec();
-    ConnectionSpec full_spec_1  = new ConnectionSpec();
-    ConnectionSpec full_spec_2  = new ConnectionSpec();
-    ConnectionSpec full_spec_3  = new ConnectionSpec();
-    ConnectionSpec full_spec_4  = new ConnectionSpec();
+    ConnectionSpec full_spec  = new ConnectionSpec();
+
     Connection IH_conn; // input to context
-    Connection PE_conn_0; // population to effort
-    Connection PE_conn_1; // population to effort
-    Connection PE_conn_2; // population to effort
-    Connection PE_conn_3; // population to effort
-    Connection PE_conn_4; // population to effort
+    Connection PE_conn; // population to effort
     
     int quart_num = 25;
     NetworkSpec network_spec = new NetworkSpec(quart_num);
@@ -62,31 +55,9 @@ class TestRecruitPop {
         ffexcite_spec.rnd_mean=0.5;
         ffexcite_spec.rnd_var=0.20;
 
-        full_spec_0.proj="full";
-        full_spec_0.pre_startix = 0;
-        full_spec_0.pre_endix = 0;
-        full_spec_0.post_startix = 0;
-        full_spec_0.post_endix = 0;
-        full_spec_1.proj="full";
-        full_spec_1.pre_startix = 1;
-        full_spec_1.pre_endix = 1;
-        full_spec_1.post_startix = 0;
-        full_spec_1.post_endix = 1;
-        full_spec_2.proj="full";
-        full_spec_2.pre_startix = 2;
-        full_spec_2.pre_endix = 2;
-        full_spec_2.post_startix = 0;
-        full_spec_2.post_endix = 2;
-        full_spec_3.proj="full";
-        full_spec_3.pre_startix = 3;
-        full_spec_3.pre_endix = 3;
-        full_spec_3.post_startix = 0;
-        full_spec_3.post_endix = 3;
-        full_spec_4.proj="full";
-        full_spec_4.pre_startix = 4;
-        full_spec_4.pre_endix = 4;
-        full_spec_4.post_startix = 0;
-        full_spec_4.post_endix = 4;
+        full_spec.proj="full";
+
+        
         
         // layers
         input_layer = new Layer(inputvecsize, new LayerSpec(false), excite_unit_spec, INPUT, "Input");
@@ -95,24 +66,18 @@ class TestRecruitPop {
         effort_layer  = new Layer(populationsize, new LayerSpec(false), excite_unit_spec, HIDDEN, "Effort");
         // connections
         IH_conn = new Connection(input_layer, hidden_layer, ffexcite_spec);
-        PE_conn_0 = new Connection(population_layer, effort_layer, full_spec_0);
-        PE_conn_1 = new Connection(population_layer, effort_layer, full_spec_1);
-        PE_conn_2 = new Connection(population_layer, effort_layer, full_spec_2);
-        PE_conn_3 = new Connection(population_layer, effort_layer, full_spec_3);
-        PE_conn_4 = new Connection(population_layer, effort_layer, full_spec_4);
+        PE_conn = new Connection(population_layer, effort_layer, full_spec);
         
+        PE_conn.weights(w_effort);
 
+        printMatrix("conn0", PE_conn.weights());
+        //printMatrix("conn2", PE_conn_2.weights());
+        //printMatrix("conn3", PE_conn_3.weights());
         // network
         network_spec.do_reset = false; // since dont use learning, avoid resetting every quarter
 
         Layer[] layers = {input_layer, hidden_layer, population_layer, effort_layer};
-        Connection[] conns = {IH_conn, 
-            PE_conn_0,
-            PE_conn_1,
-            PE_conn_2,
-            PE_conn_3,
-            PE_conn_4
-        };
+        Connection[] conns = {IH_conn, PE_conn };
 
 
         netw = new Network(network_spec, layers, conns);
@@ -128,7 +93,7 @@ class TestRecruitPop {
             input_layer.units[0].getOutput(),
             populationsize,
             0, 1,
-            0.5
+            0.25
         );
         population_layer.force_activity(pop_act);
         // PE_conn.weights(w_effort);
