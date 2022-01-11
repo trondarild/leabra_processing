@@ -38,6 +38,9 @@ class TestDopaReservoir {
     float w_da = 0.5;
     float w_ado = 0.5;
     float w_inp = 0.75;
+    float[] dopaweights = ones(hiddensize);
+    float[] adenoweights = ones(hiddensize);
+    float dopa_force;
 
     TestDopaReservoir () {
         // unit
@@ -55,7 +58,7 @@ class TestDopaReservoir {
 
         excite_auto_unit_spec = new UnitSpec(excite_unit_spec);
         excite_auto_unit_spec.c_act_thr = 0.5;
-        excite_auto_unit_spec.bias = 0.25;
+        excite_auto_unit_spec.bias = 0; //0.25;
         
 
         // connection spec
@@ -104,8 +107,9 @@ class TestDopaReservoir {
         adeno_res.setInput(multiply(w_ado, hidden_layer.getOutput()));
         adeno_res.cycle();
 
-        hidden_layer.set_dopa(multiply(dopa_res.getOutput()[0], ones(hiddensize)));
-        hidden_layer.set_adeno(adeno_res.getOutput());
+        hidden_layer.set_dopa(multiply(dopa_res.getOutput()[0], dopaweights));
+        hidden_layer.set_adeno(mult_per_elm(adenoweights, adeno_res.getOutput()));
+        dopa_layer.units[0].force_activity(dopa_force);
 
         if(netw.accept_input()) {
             float[] inp = inputval;
@@ -170,7 +174,7 @@ class TestDopaReservoir {
             translate(0, 20);
             pushMatrix();
             translate(10, 50);
-            barchart_array(multiply(1.0, hidden_layer.act_thr()), hidden_layer.name);
+            barchart_array(multiply(1.0, hidden_layer.act_thr()), "Threshold " + hidden_layer.name);
             popMatrix();
 
             translate(0, 20);
@@ -211,5 +215,26 @@ class TestDopaReservoir {
         this.setInput(zeros(inputvecsize));
     }
 
-
+    void handleMidi(int note, int vel){
+        println("Note "+ note + ", vel " + vel);
+        float scale = 1/127.0;
+        if(note==1) //pot 1
+            dopa_force = scale * vel;
+        if(note==81) // slider 1
+            dopaweights[0] = scale * vel;
+        if(note==82) // slider 1
+            dopaweights[1] = scale * vel;
+        if(note==83) // slider 1
+            dopaweights[2] = scale * vel;
+        if(note==84) // slider 1
+            adenoweights[0] = scale * vel;
+        if(note==85) // slider 1
+            adenoweights[1] = scale * vel;
+        if(note==86) // slider 1
+            adenoweights[2] = scale * vel;
+        if(note==87) // slider 1
+            inputval[0] = scale * vel;
+        if(note==88) // slider 1
+            inputval[1] = scale * vel;
+    }
 }
