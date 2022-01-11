@@ -133,5 +133,11 @@ class TestTemplate {
         this.setInput(zeros(inputvecsize));
     }
 
+    void handleMidi(int note, int vel){
+        println("Note "+ note + ", vel " + vel);
+        float scale = 1.0/127.0;
+        if(note==81)
+            inputval[0] = scale * vel; 
+    }
 
 }
