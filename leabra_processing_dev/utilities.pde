@@ -831,3 +831,13 @@ float[][] repeatCols(int cols, float[][] a){
   }
   return retval;  
 }
+
+float[] populationEncode(float val, int size, float min, float max, float sigma) {
+    float[] retval = zeros(size);
+    retval = gaussian1(size, (size-1)*(val-min)/(max-min), sigma);
+    float n = norm1(retval);
+
+    if(n != 0)
+        multiply(1.0/n, retval);
+    return retval;
+}

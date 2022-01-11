@@ -586,3 +586,23 @@ float[][] transpose(float[][] a){
   }
   return retval;
 }
+
+float gaussian1(float x, float sigma)
+{
+  return exp(-sq(x)/(2*sq(sigma)));
+}
+
+float[] gaussian1(int size, float center, float sigma) {
+  float[] retval = zeros(size);
+    
+  for (int i=0; i<size; i++)
+    retval[i] = gaussian1(center-(float)i, sigma);
+  return retval;
+}
+
+float norm1(float[] a) {
+  float r = 0;
+  for (int i=0; i < a.length; i++)
+    r += abs(a[i]);
+  return r;
+}
