@@ -338,10 +338,10 @@ class UnitSpec{
     float avg_lrn_max = 0.5;    // maximum avg_l_lrn value
     // dopa adeno
     boolean use_dopa = false;
-    float d1_thr = 0.5; // upper limit for D1
-    float d2_thr = 0.5; // lower limit for D2
-    float a1_thr = 0.5; // upper limit for A1
-    float a2_thr = 0.5; // lower limit for A2
+    float d1_thr = 0.05; // upper limit for D1 (500nM) Tratham Davidson 2004
+    float d2_thr = 0.1; // lower limit for D2 (1000nM) "
+    float a1_thr = 0.8; // upper limit for A1 (70 nm, wide dynamic range)
+    float a2_thr = 0.9; // lower limit for A2 (5200 nm, very much higher than a1)
 
     float[][] nxx1_conv;
     
@@ -551,10 +551,10 @@ class UnitSpec{
         unit.act_thr = this.logistic(this.c_act_thr
             - max(0, unit.r_d1 - unit.r_a1)
             + max(0, unit.r_d2 - unit.r_a2));
-        println(unit.name + " r_d1: " + unit.r_d1 + "; r_a1: " + unit.r_a1 );
-        println(unit.name + " r_d2: " + unit.r_d2 + "; r_a2: " + unit.r_a2 );
-        println(unit.name + " thr: " + unit.act_thr);
-        println();
+        // println(unit.name + " r_d1: " + unit.r_d1 + "; r_a1: " + unit.r_a1 );
+        // println(unit.name + " r_d2: " + unit.r_d2 + "; r_a2: " + unit.r_a2 );
+        // println(unit.name + " thr: " + unit.act_thr);
+        // println();
 
         // reseting v_m if over the threshold (spike-like behavior)
         if (unit.v_m > unit.act_thr){ // 2021-12-05 TAT may use Dopa and Adeno to modulate act_thr!
