@@ -280,7 +280,7 @@ void drawColGrid(float x1, float y1, float dim, float[][] top){
   top - array of values: pos and neg values drawn differently
   */
   
-  drawColGrid(x1, y1, dim, 10, "", top);
+  drawColGrid(x1, y1, dim, 5, "", top);
 }
 
 void drawColGrid(float x1, float y1, float dim, float margin, String title, float[][] top){
