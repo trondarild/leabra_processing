@@ -125,7 +125,6 @@ class Connection{
                 links.get(i).wt  = value[0][i];
                 links.get(i).fwt = this.spec.sig_inv(value[0][i]);
             }
-                
         }
         else{  // proj == 'full'
             // link_it = iter(this.links)  // link iterator
@@ -318,7 +317,9 @@ class ConnectionSpec{
         int pre_end = this.pre_endix == -1 ? connection.pre.units.length-1 : this.pre_endix;
         int post_end = this.post_endix == -1 ? connection.post.units.length-1 : this.post_endix;
         
-        assert (pre_end-this.pre_startix + 1 == post_end-this.post_startix + 1);
+        assert (pre_end-this.pre_startix + 1 == post_end-this.post_startix + 1) : 
+            connection.name + ": " + (pre_end-this.pre_startix + 1) 
+            + " != " + (post_end-this.post_startix + 1);
         // for i, (pre_u, post_u) in enumerate(zip(connection.pre.units, connection.post.units)):
         // for (int i = 0; i < connection.pre.units.length; ++i) {
         for (int i = 0; i <= pre_end-this.pre_startix; ++i) {
