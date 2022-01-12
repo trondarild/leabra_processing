@@ -171,6 +171,20 @@ float limitval(float lower, float upper, float a){
   
 }
 
+int limitval(int lower, int upper, int a){
+  int ret = 0;
+  
+    if(a < lower) 
+      ret = lower;
+    else if(a > upper) 
+      ret = upper;
+    else 
+      ret = a;
+  
+  return ret;
+  
+}
+
 float[] limitval(float lower, float upper, float[] a){
   float[] ret = zeros(a.length);
   for (int j=0; j<ret.length; j++){
