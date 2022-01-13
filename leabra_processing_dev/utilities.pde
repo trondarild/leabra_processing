@@ -832,6 +832,16 @@ float[][] repeatCols(int cols, float[][] a){
   return retval;  
 }
 
+float[][] tileRows(int times, float[][] a){
+  float[][] retval = zeros(a.length*times, a[0].length);
+  for (int j = 0; j < times; ++j) {
+    for (int i = 0; i < a.length; ++i) {
+      System.arraycopy(a[i], 0, retval[j*a.length + i], 0, a[0].length);
+    }
+  }
+  return retval;
+}
+
 float[] populationEncode(float val, int size, float min, float max, float sigma) {
     float[] retval = zeros(size);
     retval = gaussian1(size, (size-1)*(val-min)/(max-min), sigma);
@@ -840,4 +850,20 @@ float[] populationEncode(float val, int size, float min, float max, float sigma)
     if(n != 0)
         multiply(1.0/n, retval);
     return retval;
+}
+
+float[] setSubArray(float[] source, float[] target, int start){
+  // todo assert
+  float[] retval = zeros(target.length);
+  System.arraycopy(target, 0, retval, 0, target.length);
+  System.arraycopy(source, 0, retval, start, source.length);
+  return retval;
+    
+}
+
+
+float[] getSubArray(float[] source, int start, int length){
+  float[] retval = zeros(length);
+  System.arraycopy(source, start, retval, 0, length);
+  return retval;
 }

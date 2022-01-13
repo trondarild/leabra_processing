@@ -196,4 +196,13 @@ class TestCtxPredError {
         this.setInput(zeros(inputvecsize));
     }
 
+    void handleMidi(float note, float vel){
+        println("Note "+ note + ", vel " + vel);
+        float scale = 1.0/127.0;
+        if(note==81)
+            inputval[0] = scale * vel; 
+        if(note==82)
+            inputval[1] = scale * vel; 
+    }
+
 }

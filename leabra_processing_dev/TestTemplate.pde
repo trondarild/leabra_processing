@@ -140,4 +140,19 @@ class TestTemplate {
             inputval[0] = scale * vel; 
     }
 
+    void drawLayer(Layer layer){
+        float[][] viz = {layer.getOutput()};
+        
+
+        translate(0, 20);
+        pushMatrix();
+        text(layer.name, 0,0);
+        pushMatrix();
+        translate(100, -10);
+        drawColGrid(0,0, 10, multiply(200, viz));
+        popMatrix();
+        popMatrix();
+            
+    }
+
 }
