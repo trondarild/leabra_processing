@@ -1,9 +1,14 @@
 # Notes
 * 2022-01-13
+    * note: also possible to use Connection<Layer>, but this would be large diff
     * note: could also use interface "Connectable" so unit, connection, 
     * changes to implement Link inheritance system and DendriteConnection, ReservoirConnection:
-        1. add Connection::add_inhibitory()
-        1. add Connection::add_excitatory() # note only inh for dendrite conn
+        1. add Connection::add_inhibitory() # note no inh for reservoirs
+        1. add Connection::add_excitatory() # note no exc for dendrite conn
+        1. add to Connection: avg_s_eff, avg_m
+        1. OR add avg_s_eff, avg_m to base class
+        1. OR use accessors and interfaces instead of direct access: 
+            link.post.avg_m -> link.post().avg_m(), Link as interface
         1. AbstractLink -> Link
         1. Link -> UnitLink
         1. Connection -> LayerConnection
