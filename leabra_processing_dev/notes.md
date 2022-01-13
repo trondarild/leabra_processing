@@ -1,4 +1,13 @@
 # Notes
+* 2022-01-13
+    * note: could also use interface "Connectable" so unit, connection, 
+    * changes to implement Link inheritance system and DendriteConnection, ReservoirConnection:
+        1. add Connection::add_inhibitory()
+        1. add Connection::add_excitatory() # note only inh for dendrite conn
+        1. AbstractLink -> Link
+        1. Link -> UnitLink
+        1. Connection -> LayerConnection
+        1. Connection as abstract base class w/o pre post layers
 * 2022-01-11
     * Could population coding be used to recruit units?
     * D1 receptors: < 500nM; D2 receptors > 1000nM
