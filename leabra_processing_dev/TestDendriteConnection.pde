@@ -45,7 +45,7 @@ class TestDendriteConnection{
         {0, 1,  0, 1, 0,  1, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 1, 0,  0},
         {0, 1,  0, 1, 0,  1, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 1,  0}
     };
-
+    float[] inputval = zeros(inputvecsize);
     TestDendriteConnection(){
         // unit
         excite_unit_spec.adapt_on = false;
@@ -70,15 +70,15 @@ class TestDendriteConnection{
 
         // connections
         ID1_conn = new Connection(input_layer, striatum_d1_layer, ffexcite_spec);
-        PfcIDendr_conn = new DendriteConnection(pfc_layer, ID1_conn, ffexcite_spec);
+        //PfcIDendr_conn = new DendriteConnection(pfc_layer, ID1_conn, ffexcite_spec);
 
         Layer[] layers = {input_layer, striatum_d1_layer, pfc_layer};
-        Connection[] conns = {ID1_conn, PfcIDendr_conn};
+        Connection[] conns = {ID1_conn};//, PfcIDendr_conn};
 
         netw = new Network(network_spec, layers, conns);
         netw.build();
     }
-
+    void setInput(float[] inp) { inputval = inp; }
     void tick(){
         if(netw.accept_input()){
             println();
@@ -132,6 +132,45 @@ class TestDendriteConnection{
         popMatrix();
 
         popMatrix();
+    }
+
+        void handleKeyDown(char k){
+        float[] ctx = zeros(inputvecsize);
+        if (k=='z')
+            ctx[0] = 1.f;
+        else if(k=='x')
+            ctx[1] = 1.f;
+        else if(k=='c')
+            ctx[2] = 1.f;
+
+        this.setInput(ctx);
+
+    }
+
+    void handleKeyUp(char k){
+        this.setInput(zeros(inputvecsize));
+    }
+
+    void handleMidi(int note, int vel){
+        println("Note "+ note + ", vel " + vel);
+        float scale = 1.0/127.0;
+        if(note==81)
+            inputval[0] = scale * vel; 
+    }
+
+    void drawLayer(Layer layer){
+        float[][] viz = {layer.getOutput()};
+        
+
+        translate(0, 20);
+        pushMatrix();
+        text(layer.name, 0,0);
+        pushMatrix();
+        translate(100, -10);
+        drawColGrid(0,0, 10, multiply(200, viz));
+        popMatrix();
+        popMatrix();
+            
     }
     
 }
