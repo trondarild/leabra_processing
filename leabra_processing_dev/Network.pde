@@ -234,6 +234,27 @@ class Network{
         return sse;
     }
 
+    float compute_hamming() {
+        /* Compute the hamming distance, which only cares
+        about whether the correct indeces are active or not 
+        (ie dont care about whether level of activation is correct)
+        */
+        float hd = 0;
+        //for name, activities in this._outputs.items():
+        for (Map.Entry<String, FloatList> entry : this.outputs.entrySet()) {
+            String name = entry.getKey();
+            FloatList act = entry.getValue();
+            Layer layer = this.get_layer(name);
+            //for act, unit in zip(activities, this._get_layer(name).units):
+            float[] pred = new float[act.size()]; 
+            for (int i = 0; i < layer.units.length; ++i) 
+                pred[i] = layer.units[i].act_m  ;  
+            hd += hammingDistanceThr(act.array(), pred, 0.2);
+            
+        }
+        return hd/this.outputs.entrySet().size();
+    }
+
     void end_minus_phase(){
         // """End of the minus phase. Current unit activity is stored."""
         for(Layer layer : this.layers)
