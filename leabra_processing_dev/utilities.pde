@@ -801,7 +801,7 @@ float[][] generateUniquePatterns(int rows, int cols, int hots){
 boolean isInMatrix(float[] vec, float[][] matrix){
   if(vec.length != matrix[0].length) return false;
   
-  for(int i=0; i<matrix[0].length; i++)
+  for(int i=0; i<matrix.length; i++)
     if(equal(vec, matrix[i])) return true;
   return false;
 }
