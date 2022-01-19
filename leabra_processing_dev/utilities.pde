@@ -867,3 +867,31 @@ float[] getSubArray(float[] source, int start, int length){
   System.arraycopy(source, start, retval, 0, length);
   return retval;
 }
+
+float hammingDistanceZero(float[] a, float[] b) {
+  // counts the number of ixes that are unequal in being zero
+  float retval = 0;
+  assert(a.length == b.length) : a.length + " := " + b.length;
+  for (int i = 0; i < a.length; ++i) {
+    if(a[i] == 0. && b[i] != 0 || a[i] > 0 && b[i]==0) retval += 1.0;
+  }
+  return retval;
+}
+
+float hammingDistanceThr(float[] a, float[] b, float thr) {
+  // counts the number of ixes that are unequal in being zero
+  float retval = 0;
+  assert(a.length == b.length) : a.length + " := " + b.length;
+  for (int i = 0; i < a.length; ++i) {
+    if(a[i] == 0. && b[i] >= thr || a[i] > 0 && b[i]<0) retval += 1.0;
+  }
+  return retval;
+}
+
+float[] decimate(float[] a, int keep) {
+  float[] retval = zeros(a.length/keep);
+  for (int i = 0; i < retval.length && i*keep < a.length; ++i) {
+    retval[i] = a[i*keep];
+  }
+  return retval;
+}
