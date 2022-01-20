@@ -1,8 +1,8 @@
 class TestHiddenAssociation {
     String modelname = "Hidden layer associator, ";
     
-    int numpatterns = 2;
-    int patternsize = 7;
+    int numpatterns = 5;
+    int patternsize = 10;
     int hots = 3;
     int ctr = 0;
     float[][] sourcepatterns;
@@ -61,14 +61,14 @@ class TestHiddenAssociation {
         ffexcite_spec.proj="full";
         ffexcite_spec.rnd_type="uniform" ;
         ffexcite_spec.rnd_mean=0.5;
-        ffexcite_spec.rnd_var=0.20;
+        ffexcite_spec.rnd_var=0.0;
         
 
         ffexcite_spec_learn.proj="full";
         ffexcite_spec_learn.rnd_type="uniform" ;
-        ffexcite_spec_learn.rnd_mean=0.1;
-        ffexcite_spec_learn.rnd_var=0.1;
-        ffexcite_spec_learn.lrate = 0.025;
+        ffexcite_spec_learn.rnd_mean=0.075;
+        ffexcite_spec_learn.rnd_var=0.2;
+        ffexcite_spec_learn.lrate = 0.055;
         ffexcite_spec_learn.lrule = "leabra";
 
 
