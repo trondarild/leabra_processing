@@ -14,7 +14,7 @@ int midiDevice  = 0;
 //TestInhibition test = new TestInhibition();
 //TestTaskNet test = new TestTaskNet();
 //TestForceActivity test = new TestForceActivity();
-TestDendriteConnection test = new TestDendriteConnection();
+//TestDendriteConnection test = new TestDendriteConnection();
 //TestAutoActivity test = new TestAutoActivity();
 //TestCtxPredError test = new TestCtxPredError();
 //TestRandomAssociator test = new TestRandomAssociator();
@@ -26,6 +26,8 @@ TestDendriteConnection test = new TestDendriteConnection();
 //TestReservoir test = new TestReservoir();
 //TestDopaReservoir test = new TestDopaReservoir();
 //TestPopulationCode test = new TestPopulationCode();
+//TestSimpleAssociation test = new TestSimpleAssociation();
+TestHiddenAssociation test = new TestHiddenAssociation();
 
 void setup(){
 	size(600, 1000);
